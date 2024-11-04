@@ -6,13 +6,31 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/AuthStack';
 import Feather from 'react-native-vector-icons/Feather'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
 
 type DatingIntentionScreenProps = NativeStackScreenProps<AuthStackParamList, 'DatingIntentionScreen'>;
 
 const DatingIntentionScreen = ({navigation}:DatingIntentionScreenProps) => {
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
     const [selectedIntention, setSelectedIntention] = useState('');
     
+    const getIntention = async()=>{
+        const datingType = await getRegistrationProgress('DatingType');
+        if(datingType){
+            setSelectedIntention(datingType);
+            setDisabled(false);
+        }
+    }
+
+    useEffect(()=>{
+        getIntention();
+    },[])
+
+    const handleIntentionChange = async(text:string)=>{
+        setSelectedIntention(text);
+        await saveRegistrationProgress('DatingType', text);
+        setDisabled(false);
+    }
     
     return (
         <SafeAreaView style={styles.container}>
@@ -25,7 +43,7 @@ const DatingIntentionScreen = ({navigation}:DatingIntentionScreenProps) => {
             <View>
                 <View style={[styles.intentionViewContainer,{marginTop:40}]}>
                     <Text style={styles.intentionName}>Life partner</Text>
-                    <Pressable onPress={()=>setSelectedIntention('Life partner')}>
+                    <Pressable onPress={()=>handleIntentionChange('Life partner')}>
                         <FontAwesome 
                         name={selectedIntention === 'Life partner'? 'dot-circle-o' : 'circle-o'} 
                         size={28}  
@@ -35,7 +53,7 @@ const DatingIntentionScreen = ({navigation}:DatingIntentionScreenProps) => {
                 </View>
                 <View style={styles.intentionViewContainer}>
                     <Text style={styles.intentionName}>Long-term relationship</Text>
-                    <Pressable onPress={()=>setSelectedIntention('Long-term relationship')}>
+                    <Pressable onPress={()=>handleIntentionChange('Long-term relationship')}>
                         <FontAwesome 
                         name={selectedIntention === 'Long-term relationship'? 'dot-circle-o' : 'circle-o'} 
                         size={28}  
@@ -45,7 +63,7 @@ const DatingIntentionScreen = ({navigation}:DatingIntentionScreenProps) => {
                 </View>
                 <View style={styles.intentionViewContainer}>
                     <Text style={styles.intentionName}>Long-term relationship, open to short</Text>
-                    <Pressable onPress={()=>setSelectedIntention('Long-term relationship, open to short')}>
+                    <Pressable onPress={()=>handleIntentionChange('Long-term relationship, open to short')}>
                         <FontAwesome 
                         name={selectedIntention === 'Long-term relationship, open to short'? 'dot-circle-o' : 'circle-o'} 
                         size={28} 
@@ -55,7 +73,7 @@ const DatingIntentionScreen = ({navigation}:DatingIntentionScreenProps) => {
                 </View>
                 <View style={styles.intentionViewContainer}>
                     <Text style={styles.intentionName}>Short-term relationship, open to long</Text>
-                    <Pressable onPress={()=>setSelectedIntention('Short-term relationship, open to long')}>
+                    <Pressable onPress={()=>handleIntentionChange('Short-term relationship, open to long')}>
                         <FontAwesome 
                         name={selectedIntention === 'Short-term relationship, open to long'? 'dot-circle-o' : 'circle-o'} 
                         size={28} 
@@ -65,7 +83,7 @@ const DatingIntentionScreen = ({navigation}:DatingIntentionScreenProps) => {
                 </View>
                 <View style={styles.intentionViewContainer}>
                     <Text style={styles.intentionName}>Short-term relationship</Text>
-                    <Pressable onPress={()=>setSelectedIntention('Short-term relationship')}>
+                    <Pressable onPress={()=>handleIntentionChange('Short-term relationship')}>
                         <FontAwesome 
                         name={selectedIntention === 'Short-term relationship'? 'dot-circle-o' : 'circle-o'} 
                         size={28} 
@@ -75,7 +93,7 @@ const DatingIntentionScreen = ({navigation}:DatingIntentionScreenProps) => {
                 </View>
                 <View style={styles.intentionViewContainer}>
                     <Text style={styles.intentionName}>Figuring out my dating goals</Text>
-                    <Pressable onPress={()=>setSelectedIntention('Figuring out my dating goals')}>
+                    <Pressable onPress={()=>handleIntentionChange('Figuring out my dating goals')}>
                         <FontAwesome 
                         name={selectedIntention === 'Figuring out my dating goals'? 'dot-circle-o' : 'circle-o'} 
                         size={28} 
@@ -85,7 +103,7 @@ const DatingIntentionScreen = ({navigation}:DatingIntentionScreenProps) => {
                 </View>
                 <View style={styles.intentionViewContainer}>
                     <Text style={styles.intentionName}>Prefer not to say</Text>
-                    <Pressable onPress={()=>setSelectedIntention('Prefer not to say')}>
+                    <Pressable onPress={()=>handleIntentionChange('Prefer not to say')}>
                         <FontAwesome 
                         name={selectedIntention === 'Prefer not to say'? 'dot-circle-o' : 'circle-o'} 
                         size={28} 

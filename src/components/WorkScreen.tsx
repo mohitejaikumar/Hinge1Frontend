@@ -4,68 +4,68 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import NextButton from './NextButton';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/AuthStack';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
 
-type HomeTownProps = NativeStackScreenProps<AuthStackParamList, 'HomeTown'>;
+
+type WorkScreenProps = NativeStackScreenProps<AuthStackParamList, 'WorkScreen'>;
 
 
-const HomeTown = ({navigation}:HomeTownProps) => {
+const WorkScreen = ({navigation}:WorkScreenProps) => {
     const [disabled, setDisabled] = useState(true);
-    const homeTownRef = useRef<TextInput>(null);
-    const [homeTown, setHomeTown] = useState('');
+    const workScreenRef = useRef<TextInput>(null);
+    const [occupation, setOccupation] = useState('');
     
-    async function getHomeTown(){
-        const storageHomeTown = await getRegistrationProgress('HomeTown');
-        setHomeTown(storageHomeTown);
-        if(storageHomeTown.length > 0){
+    const getOccupation = async()=>{
+        const occup = await getRegistrationProgress('Occupation');
+        if(occup){
+            setOccupation(occup);
             setDisabled(false);
         }
     }
-    
+
     useEffect(()=>{
-        homeTownRef.current?.focus();
-        getHomeTown();
+        workScreenRef.current?.focus();
+        getOccupation();
     },[])
-    
-    const handleHomeTownChange = async(text:string)=>{
-        setHomeTown(text.trim());
-        await saveRegistrationProgress('HomeTown', text.trim());
+
+    const handleOccupationChange = async(text:string)=>{
+        setOccupation(text.trim());
         if(text.trim().length > 0){
+            await saveRegistrationProgress('Occupation', text.trim());
             setDisabled(false);
         }
-        else{
-            setDisabled(true);
-        }
     }
+    
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.homeContainer}>
-                <View style={styles.homeIcon}>
-                    <Ionicons name="home-outline" size={25} color="#000000" />
+            <View style={styles.workContainer}>
+                <View style={styles.workIcon}>
+                    <MaterialCommunityIcons name="bag-personal-outline" size={25} color="#000000" />
                 </View>
-                <Text style={styles.largeText}>Where's your home {"\n"}town?</Text>
+                <Text style={styles.largeText}>What do you do?</Text>
                 <TextInput
-                    ref={homeTownRef}
-                    placeholder="Home Town"
-                    value ={homeTown}
-                    onChangeText={handleHomeTownChange}
-                    style={styles.homeInput}
+                    ref={workScreenRef}
+                    placeholder="Occupation"
+                    style={styles.workInput}
                     placeholderTextColor='#DAE0E2'
+                    value={occupation}
+                    onChangeText={handleOccupationChange}
+                    
                 />
             </View>
             <NextButton
                 disabled={disabled}
                 onPress={()=>{
                     if(disabled)return;
-                    navigation.replace('ReligionScreen')
+                    navigation.replace('PasswordScreen')
                 }}
             />
         </SafeAreaView>
     )
 }
 
-export default HomeTown
+export default WorkScreen
 
 const styles = StyleSheet.create({
     container:{
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
         backgroundColor:'#fff',
         position:'relative',
     },
-    homeIcon:{
+    workIcon:{
         height:40,
         width:40,
         display:'flex',
@@ -90,10 +90,10 @@ const styles = StyleSheet.create({
         fontFamily: 'TiemposHeadline-Semibold',
         lineHeight:43
     },
-    homeContainer:{
+    workContainer:{
         marginTop:87
     },
-    homeInput:{
+    workInput:{
         borderBottomWidth:1,
         marginTop:30,
         paddingVertical:10,

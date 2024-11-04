@@ -5,17 +5,45 @@ import { AuthStackParamList } from '../navigation/AuthStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import NextButton from './NextButton';
+import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
 
 
 type EmailScreenProps = NativeStackScreenProps<AuthStackParamList, 'EmailScreen'>;
 
 const EmailScreen = ({navigation}:EmailScreenProps) => {
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
     const emailRef = useRef<TextInput>(null);
+    const [email , setEmail] = useState('');
     
+    const getEmail = async()=>{
+        const storageEmail = await getRegistrationProgress('Email');
+        setEmail(storageEmail);
+        if(storageEmail.length > 0){
+            setDisabled(false);
+        }
+    }
+
     useEffect(()=>{
         emailRef.current?.focus();
+        getEmail();
     },[])
+    
+    function isValidEmail(e:string) {
+        const emailRegex = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(e);
+    }
+
+    const handleEmailChange = async(text:string)=>{
+        setEmail(text.trim());
+        await saveRegistrationProgress('Email', text.trim());
+        if(text.trim().length > 0 && isValidEmail(text.trim())){
+            setDisabled(false);
+        }
+        else{
+            setDisabled(true);
+        }
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.emailContainer}>
@@ -25,10 +53,12 @@ const EmailScreen = ({navigation}:EmailScreenProps) => {
                 <Text style={styles.largeText}>Please provide a valid {"\n"}email</Text>
                 <TextInput
                     ref={emailRef}
+                    value={email}
                     placeholder="email@example.com"
                     style={styles.emailInput}
                     placeholderTextColor='#DAE0E2'
                     keyboardType='email-address'
+                    onChangeText={handleEmailChange}
                 />
             </View>
             <NextButton

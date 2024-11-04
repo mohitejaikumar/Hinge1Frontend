@@ -8,6 +8,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import Entypo from 'react-native-vector-icons/Entypo'
 import { useFocusEffect } from '@react-navigation/native';
+import { useRegistration } from '../hooks/useRegistration';
 
 type PromptScreenProps = NativeStackScreenProps<AuthStackParamList, 'PromptScreen'>;
 
@@ -19,21 +20,29 @@ type Prompt = string |{
 const PromptScreen = ({navigation,route}:PromptScreenProps) => {
     const [disabled, setDisabled] = useState(true);
     const [prompts, setPrompts] = useState<Prompt[]>(["","",""]);
-    
+    const {setBehaviours} = useRegistration();
     
     useEffect(()=>{
         
         if (route.params) {
-             //@ts-ignore
-            setPrompts(route.params?.prompts);
-            let isDone = true;
-            for(let i=0;i<prompts.length;i++){
-                if(prompts[i] === ""){
-                    isDone = false;
-                    break;
+            const newPrompt = route.params?.prompts;
+            
+            if(newPrompt){
+                setPrompts(newPrompt);
+                console.log(route.params?.prompts);
+                let isDone = true;
+                
+                for(let i=0;i<newPrompt.length;i++){
+                    if(newPrompt![i] === ""){
+                        isDone = false;
+                        break;
+                    }
                 }
+                //@ts-ignore
+                setBehaviours(newPrompt);
+                setDisabled(!isDone);
             }
-            setDisabled(!isDone);
+            
         }
         
     },[]);
@@ -85,7 +94,7 @@ const PromptScreen = ({navigation,route}:PromptScreenProps) => {
                 disabled={disabled}
                 onPress={()=>{
                     if(disabled)return;
-                    navigation.replace('FinalScreen')
+                    navigation.replace('WorkScreen')
                 }}
             />
         </SafeAreaView>

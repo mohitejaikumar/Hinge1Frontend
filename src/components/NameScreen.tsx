@@ -5,17 +5,50 @@ import { AuthStackParamList } from '../navigation/AuthStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NextButton from './NextButton';
+import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
 
 type NameScreenProps = NativeStackScreenProps<AuthStackParamList, 'NameScreen'>;
 
 const NameScreen = ({navigation}:NameScreenProps) => {
     const firstNameRef = useRef<TextInput>(null);
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
+    const [firstName, setFirstName] = useState(''); 
+    const [lastName, setLastName] = useState('');
+    
 
+    async function getName(){
+        const storageFirstName:string = await getRegistrationProgress('FirstName')
+        setFirstName(storageFirstName);
+        setLastName(await getRegistrationProgress('LastName'));
+        
+        if(storageFirstName.length > 0){
+            setDisabled(false);
+        }
+    }
 
     useEffect(()=>{
         firstNameRef.current?.focus();
+        getName();
     },[])
+
+    const handleFirstNameChange = async (text: string) => {
+        setFirstName(text.trim());
+        if(text.trim().length >0){
+            await saveRegistrationProgress('FirstName', text.trim());
+            setDisabled(false);
+        }
+        else{
+            setDisabled(true);
+        }
+    }
+
+    const handleLastNameChange = async(text: string) => {
+        setLastName(text.trim());
+        if(text.trim().length >0){
+            await saveRegistrationProgress('LastName', text.trim());
+        }
+
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -28,14 +61,18 @@ const NameScreen = ({navigation}:NameScreenProps) => {
                 <View style={styles.nameContainer}>
                     <TextInput
                         ref={firstNameRef}
+                        value={firstName}
                         placeholder="First name"
                         style={styles.nameInput}
                         placeholderTextColor='#DAE0E2'
+                        onChangeText={handleFirstNameChange}
                     />
                     <TextInput
                         placeholder="Last name"
+                        value={lastName}
                         style={styles.nameInput}
                         placeholderTextColor='#DAE0E2'
+                        onChangeText={handleLastNameChange}
                     />
                     <Text style={styles.smallText}>Last name is optional, and only shared with {"\n"}matches.</Text>
                 </View>

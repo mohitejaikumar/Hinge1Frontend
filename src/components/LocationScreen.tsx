@@ -1,24 +1,32 @@
-import { View, Text, StyleSheet, SafeAreaView, Platform, PermissionsAndroid, Button, Pressable } from 'react-native'
-import React, { useLayoutEffect, useRef, useState } from 'react'
+import { View, Text, StyleSheet, SafeAreaView, Platform, PermissionsAndroid, Pressable } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import NextButton from './NextButton'
 import { AuthStackParamList } from '../navigation/AuthStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation'
+import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
 
 type LocationScreenProps = NativeStackScreenProps<AuthStackParamList, 'LocationScreen'>;
 
 const LocationScreen = ({navigation}:LocationScreenProps) => {
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
     const mapRef = useRef<MapView>(null);
     const [location, setLocation] = useState({latitude:0, longitude:0});
     console.log('location', location);
     const [region, setRegion] = useState("");
     
-
-    useLayoutEffect(()=>{
+    const getLocation = async()=>{
+        const location = await getRegistrationProgress('Location');
+        if(location !== null){
+            setLocation(JSON.parse(location));
+            setDisabled(false);
+        }
+    }
+    useEffect(()=>{
         requestLocationPermission();
+        getLocation();
     },[])
 
     const requestLocationPermission = async () => {
@@ -36,9 +44,10 @@ const LocationScreen = ({navigation}:LocationScreenProps) => {
     };
     const goToMyLocation = () => {
         Geolocation.getCurrentPosition(
-        (position) => {
+        async(position) => {
             const { latitude, longitude } = position.coords;
             setLocation({ latitude, longitude });
+            
             console.log(position);
             // Animate map to user location
             mapRef.current?.animateToRegion({
@@ -47,26 +56,68 @@ const LocationScreen = ({navigation}:LocationScreenProps) => {
             latitudeDelta: 0.01, // Zoom level
             longitudeDelta: 0.01,
             }, 1000); // Duration in milliseconds
-
-            fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyATUxdKZEwD_PcaAmQSwtz-wodXzHRE2wo`,
-            )
-            .then(response => response.json())
-            .then(data => {
+            
+            try{
+                const response = await fetch(
+                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyATUxdKZEwD_PcaAmQSwtz-wodXzHRE2wo`,
+                )
+                const data = await response.json();
                 console.log('date', data);
                 if (data.results.length > 0) {
-                    // setLocation(data.results[0].formatted_address);
+                
                     console.log(data.results[0].formatted_address);
                     setRegion(data.results[0].formatted_address);
+                    // save to async storage 
+                    await saveRegistrationProgress('Region', JSON.stringify(data.results[0].formatted_address));
+                    await saveRegistrationProgress('Location', JSON.stringify({latitude:latitude, longitude:longitude}));
+                    setDisabled(false);
                 }
-            })
-            .catch(error => console.error('Error fetching location:', error));
+            }
+            catch(error){
+                console.error('Error fetching location:', error)
+            }
         },
         (error) => {
             console.log(error);
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
         );
+    };
+
+    const handleMarkerDragEnd = async(coordinate:LatLng) => {
+    // Use reverse geocoding to get the location name from latitude and longitude
+        setLocation(coordinate);
+        
+        fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinate.latitude},${coordinate.longitude}&key=AIzaSyAWpV8r8H3ro1n3dD9LcuSSaaCeguDBFOs`,
+        )
+        .then(response => response.json())
+        .then(async data => {
+            console.log('New location:', data);
+            if (data.results.length > 0) {
+            const addressComponents = data.results[0].address_components;
+            let formattedAddress = '';
+            for (let component of addressComponents) {
+                if (component.types.includes('route')) {
+                formattedAddress += component.long_name + ', ';
+                }
+                if (component.types.includes('sublocality_level_1')) {
+                formattedAddress += component.long_name + ', ';
+                }
+                if (component.types.includes('locality')) {
+                formattedAddress += component.long_name + ', ';
+                }
+            }
+            // Remove the trailing comma and space
+            formattedAddress = formattedAddress.trim().slice(0, -1);
+            setRegion(formattedAddress);
+            // save to async storage 
+            await saveRegistrationProgress('Region', JSON.stringify(formattedAddress));
+            await saveRegistrationProgress('Location', JSON.stringify(coordinate));
+            }
+        })
+        .catch(error => console.error('Error fetching location:', error));
+        
     };
 
 
@@ -83,27 +134,30 @@ const LocationScreen = ({navigation}:LocationScreenProps) => {
                     provider={PROVIDER_GOOGLE}
                     ref={mapRef}
                     style={styles.mapContainer}
-                    showsUserLocation={true}
                     zoomEnabled={true}
                 >
                 <Marker
-                    coordinate={{
-                        latitude: location.latitude,
-                        longitude: location.longitude,
+                    draggable
+                    coordinate={location}
+                    style={{
+                        width:'100%'
                     }}
-                    style={{width:500 , backgroundColor:'red'}}
+                    onDragEnd={e => handleMarkerDragEnd(e.nativeEvent.coordinate)}
                 >   
-                    <View style={{width:500 , backgroundColor:'red'}}> 
-                        <Text style={{fontFamily:'ModernEra-Bold'}}>{region}</Text>
-                    </View>
                 </Marker>
                 </MapView>
                 <Pressable  
-                onPress={goToMyLocation}
-                style={styles.locationButton}
+                    onPress={goToMyLocation}
+                    style={styles.locationButton}
                 >
                     <Text style={{fontFamily:'ModernEra-Bold'}}>Go to my location</Text>
                 </Pressable>
+            </View>
+            <View style={{marginTop:20}}>
+                <Text style={{fontFamily:'ModernEra-Medium' , color:'#7f8c8d'}}>Long Press and Drag the marker to your location</Text>
+            </View>
+            <View style={{marginTop:20}}>
+                <Text style={{fontFamily:'ModernEra-Medium' , color:'#2c3e50'}}>{region}</Text>
             </View>
             
             <NextButton

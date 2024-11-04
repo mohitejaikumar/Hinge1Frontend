@@ -1,5 +1,5 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NextButton from './NextButton';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -9,26 +9,43 @@ import EvilIcons from 'react-native-vector-icons/EvilIcons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import * as ImagePicker from 'react-native-image-picker';
 import Entypo from 'react-native-vector-icons/Entypo'
+import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
+import { useRegistration } from '../hooks/useRegistration';
+
+
 
 type ImagesScreenProps = NativeStackScreenProps<AuthStackParamList, 'ImagesScreen'>;
 
 const ImagesScreen = ({navigation}:ImagesScreenProps) => {
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
     const [images , setImages] = useState(["","","","","",""]);
+    const [count, setCount] = useState(0);
+    const {setStorageImages} = useRegistration();
+    
+
+    useEffect(()=>{
+        if(count === 6){
+            console.log('saving images');
+            setStorageImages(images);
+            setDisabled(false);
+        }
+    },[count,images])
+    
     
     const onImageGalleryClick = useCallback((index:number) => {
         ImagePicker.launchImageLibrary({
             selectionLimit: 1,
             mediaType: 'photo',
             includeBase64: true
-        }, res => {
+        }, async res => {
             if(res.didCancel) {
                 console.log('User cancelled')
             } else if(res.errorCode) {
                 console.log('ImagePickerError: ', res.errorMessage)
             } else {
-                console.log(res);
-                console.log(res.assets![0].base64, res.assets![0].type);
+                if(images[index] === ''){
+                    setCount(ct=>ct+1);
+                }
                 setImages(prev=>{
                     const newImages = [...prev];
                     //@ts-ignore
@@ -37,7 +54,7 @@ const ImagesScreen = ({navigation}:ImagesScreenProps) => {
                 })
             }
         });
-    }, [])
+    }, [count,images])
     
     return (
         <SafeAreaView style={styles.container}>

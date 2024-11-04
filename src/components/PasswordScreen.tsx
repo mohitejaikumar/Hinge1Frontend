@@ -1,71 +1,71 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context';
-import NextButton from './NextButton';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/AuthStack';
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import NextButton from './NextButton';
+import Feather from 'react-native-vector-icons/Feather'
 
-type HomeTownProps = NativeStackScreenProps<AuthStackParamList, 'HomeTown'>;
 
+type PasswordScreenProps = NativeStackScreenProps<AuthStackParamList, 'PasswordScreen'>;
 
-const HomeTown = ({navigation}:HomeTownProps) => {
-    const [disabled, setDisabled] = useState(true);
-    const homeTownRef = useRef<TextInput>(null);
-    const [homeTown, setHomeTown] = useState('');
+const PasswordScreen = ({navigation}:PasswordScreenProps) => {
+  const [disabled, setDisabled] = useState(true);
+    const passwordRef = useRef<TextInput>(null);
+    const [password, setPassword] = useState('');
     
-    async function getHomeTown(){
-        const storageHomeTown = await getRegistrationProgress('HomeTown');
-        setHomeTown(storageHomeTown);
-        if(storageHomeTown.length > 0){
+    const getPassword = async()=>{
+        const pass = await getRegistrationProgress('Password');
+        if(pass){
+            setPassword(pass);
             setDisabled(false);
         }
     }
-    
+
     useEffect(()=>{
-        homeTownRef.current?.focus();
-        getHomeTown();
+        passwordRef.current?.focus();
+        getPassword();
     },[])
-    
-    const handleHomeTownChange = async(text:string)=>{
-        setHomeTown(text.trim());
-        await saveRegistrationProgress('HomeTown', text.trim());
+
+    const handlePasswordChange = async(text:string)=>{
+        setPassword(text.trim());
         if(text.trim().length > 0){
+            await saveRegistrationProgress('Password', text.trim());
             setDisabled(false);
         }
-        else{
-            setDisabled(true);
-        }
     }
+    
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.homeContainer}>
-                <View style={styles.homeIcon}>
-                    <Ionicons name="home-outline" size={25} color="#000000" />
+            <View style={styles.passwordContainer}>
+                <View style={styles.passwordIcon}>
+                    <Feather name="lock" size={25} color="#000000" />
                 </View>
-                <Text style={styles.largeText}>Where's your home {"\n"}town?</Text>
+                <Text style={styles.largeText}>Password</Text>
                 <TextInput
-                    ref={homeTownRef}
-                    placeholder="Home Town"
-                    value ={homeTown}
-                    onChangeText={handleHomeTownChange}
-                    style={styles.homeInput}
+                    ref={passwordRef}
+                    placeholder="********"
+                    maxLength={8}
+                    secureTextEntry={true}
+                    style={styles.passwordInput}
                     placeholderTextColor='#DAE0E2'
+                    value={password}
+                    onChangeText={handlePasswordChange}
                 />
             </View>
             <NextButton
                 disabled={disabled}
                 onPress={()=>{
                     if(disabled)return;
-                    navigation.replace('ReligionScreen')
+                    navigation.replace('FinalScreen')
                 }}
             />
         </SafeAreaView>
     )
 }
 
-export default HomeTown
+export default PasswordScreen
 
 const styles = StyleSheet.create({
     container:{
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
         backgroundColor:'#fff',
         position:'relative',
     },
-    homeIcon:{
+    passwordIcon:{
         height:40,
         width:40,
         display:'flex',
@@ -90,10 +90,10 @@ const styles = StyleSheet.create({
         fontFamily: 'TiemposHeadline-Semibold',
         lineHeight:43
     },
-    homeContainer:{
+    passwordContainer:{
         marginTop:87
     },
-    homeInput:{
+    passwordInput:{
         borderBottomWidth:1,
         marginTop:30,
         paddingVertical:10,

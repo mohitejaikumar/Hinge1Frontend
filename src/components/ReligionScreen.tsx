@@ -1,18 +1,36 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome  from 'react-native-vector-icons/FontAwesome'
 import NextButton from './NextButton';
 import { AuthStackParamList } from '../navigation/AuthStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Octicons from 'react-native-vector-icons/Octicons'
+import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
 
 type ReligionScreenProps = NativeStackScreenProps<AuthStackParamList, 'ReligionScreen'>;
 
 const ReligionScreen = ({navigation}:ReligionScreenProps) => {
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
     const [selectedReligion, setSelectedReligion] = useState('');
     
+    const getReligion = async()=>{
+        const religion = await getRegistrationProgress('Religion');
+        if(religion){
+            setSelectedReligion(religion);
+            setDisabled(false);
+        }
+    }
+
+    useEffect(()=>{
+        getReligion();
+    },[])
+
+    const handleReligionChange = async(text:string)=>{
+        setSelectedReligion(text);
+        await saveRegistrationProgress('Religion', text);
+        setDisabled(false);
+    }
     
     return (
         <SafeAreaView style={styles.container}>
@@ -26,7 +44,7 @@ const ReligionScreen = ({navigation}:ReligionScreenProps) => {
             <View>
                 <View style={[styles.religionViewContainer,{marginTop:80}]}>
                     <Text style={styles.religionName}>Hindu</Text>
-                    <Pressable onPress={()=>setSelectedReligion('Hindu')}>
+                    <Pressable onPress={()=>handleReligionChange('Hindu')}>
                         <FontAwesome 
                         name={selectedReligion === 'Hindu'? 'dot-circle-o' : 'circle-o'} 
                         size={28}  
@@ -36,7 +54,7 @@ const ReligionScreen = ({navigation}:ReligionScreenProps) => {
                 </View>
                 <View style={styles.religionViewContainer}>
                     <Text style={styles.religionName}>Muslim</Text>
-                    <Pressable onPress={()=>setSelectedReligion('Muslim')}>
+                    <Pressable onPress={()=>handleReligionChange('Muslim')}>
                         <FontAwesome 
                         name={selectedReligion === 'Muslim'? 'dot-circle-o' : 'circle-o'} 
                         size={28}  
@@ -46,7 +64,7 @@ const ReligionScreen = ({navigation}:ReligionScreenProps) => {
                 </View>
                 <View style={styles.religionViewContainer}>
                     <Text style={styles.religionName}>Sikh</Text>
-                    <Pressable onPress={()=>setSelectedReligion('Sikh')}>
+                    <Pressable onPress={()=>handleReligionChange('Sikh')}>
                         <FontAwesome 
                         name={selectedReligion === 'Sikh'? 'dot-circle-o' : 'circle-o'} 
                         size={28} 
@@ -56,7 +74,7 @@ const ReligionScreen = ({navigation}:ReligionScreenProps) => {
                 </View>
                 <View style={styles.religionViewContainer}>
                     <Text style={styles.religionName}>Christian</Text>
-                    <Pressable onPress={()=>setSelectedReligion('Christian')}>
+                    <Pressable onPress={()=>handleReligionChange('Christian')}>
                         <FontAwesome 
                         name={selectedReligion === 'Christian'? 'dot-circle-o' : 'circle-o'} 
                         size={28} 
@@ -66,7 +84,7 @@ const ReligionScreen = ({navigation}:ReligionScreenProps) => {
                 </View>
                 <View style={styles.religionViewContainer}>
                     <Text style={styles.religionName}>Atheist</Text>
-                    <Pressable onPress={()=>setSelectedReligion('Atheist')}>
+                    <Pressable onPress={()=>handleReligionChange('Atheist')}>
                         <FontAwesome 
                         name={selectedReligion === 'Atheist'? 'dot-circle-o' : 'circle-o'} 
                         size={28} 

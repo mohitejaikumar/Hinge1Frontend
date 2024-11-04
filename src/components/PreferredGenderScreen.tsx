@@ -6,13 +6,32 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/AuthStack';
 import Entypo from 'react-native-vector-icons/Entypo'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
 
 type PreferredGenderScreenProps = NativeStackScreenProps<AuthStackParamList, 'PreferredGenderScreen'>;
 
 const PreferredGenderScreen = ({navigation}:PreferredGenderScreenProps) => {
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
     const [selectedGender, setSelectedGender] = useState('');
     
+    
+    const getGender = async()=>{
+        const gender = await getRegistrationProgress('PreferredGender');
+        if(gender){
+            setSelectedGender(gender);
+            setDisabled(false);
+        }
+    }
+
+    useEffect(()=>{
+        getGender();
+    },[])
+
+    const handleGenderChange = async(text:string)=>{
+        setSelectedGender(text);
+        await saveRegistrationProgress('PreferredGender', text);
+        setDisabled(false);
+    }
     
     return (
         <SafeAreaView style={styles.container}>
@@ -26,7 +45,7 @@ const PreferredGenderScreen = ({navigation}:PreferredGenderScreenProps) => {
             <View>
                 <View style={[styles.genderViewContainer,{marginTop:80}]}>
                     <Text style={styles.genderName}>Male</Text>
-                    <Pressable onPress={()=>setSelectedGender('Male')}>
+                    <Pressable onPress={()=>handleGenderChange('Male')}>
                         <FontAwesome 
                         name={selectedGender === 'Male'? 'dot-circle-o' : 'circle-o'} 
                         size={28}  
@@ -36,7 +55,7 @@ const PreferredGenderScreen = ({navigation}:PreferredGenderScreenProps) => {
                 </View>
                 <View style={styles.genderViewContainer}>
                     <Text style={styles.genderName}>Women</Text>
-                    <Pressable onPress={()=>setSelectedGender('Women')}>
+                    <Pressable onPress={()=>handleGenderChange('Women')}>
                         <FontAwesome 
                         name={selectedGender === 'Women'? 'dot-circle-o' : 'circle-o'} 
                         size={28}  
@@ -46,7 +65,7 @@ const PreferredGenderScreen = ({navigation}:PreferredGenderScreenProps) => {
                 </View>
                 <View style={styles.genderViewContainer}>
                     <Text style={styles.genderName}>Non-binary</Text>
-                    <Pressable onPress={()=>setSelectedGender('Non-binary')}>
+                    <Pressable onPress={()=>handleGenderChange('Non-binary')}>
                         <FontAwesome 
                         name={selectedGender === 'Non-binary'? 'dot-circle-o' : 'circle-o'} 
                         size={28} 
@@ -56,7 +75,7 @@ const PreferredGenderScreen = ({navigation}:PreferredGenderScreenProps) => {
                 </View>
                 <View style={styles.genderViewContainer}>
                     <Text style={styles.genderName}>Everyone</Text>
-                    <Pressable onPress={()=>setSelectedGender('Everyone')}>
+                    <Pressable onPress={()=>handleGenderChange('Everyone')}>
                         <FontAwesome 
                         name={selectedGender === 'Everyone'? 'dot-circle-o' : 'circle-o'} 
                         size={28} 

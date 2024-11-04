@@ -17,6 +17,8 @@ import PromptScreen from '../components/PromptScreen';
 import SelectPrompt from '../components/SelectPrompt';
 import WriteAnswerScreen from '../components/WriteAnswerScreen';
 import FinalScreen from '../components/FinalScreen';
+import WorkScreen from '../components/WorkScreen';
+import PasswordScreen from '../components/PasswordScreen';
 
 type Prompt = string |{
     question:string,
@@ -48,6 +50,8 @@ export type AuthStackParamList = {
         prompts:Prompt[],
         index:number
     },
+    WorkScreen:undefined,
+    PasswordScreen:undefined,
     FinalScreen:undefined
 }
 
@@ -137,8 +141,20 @@ const AuthStack = () => {
             }}}           
             />
             <Stack.Screen
+            name="WorkScreen"
+            component={WorkScreen}
+            options={{headerTitleStyle:{
+                fontFamily:'ModernEra-Bold',
+            }}}           
+            />
+            <Stack.Screen
             name="FinalScreen"
             component={FinalScreen}
+            options={{headerShown:false}}            
+            />
+            <Stack.Screen
+            name="PasswordScreen"
+            component={PasswordScreen}
             options={{headerShown:false}}            
             />
         </Stack.Navigator>
