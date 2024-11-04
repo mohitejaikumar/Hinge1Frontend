@@ -1,0 +1,21 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/ModernEra-Bold.ttf",
+      "sha1": "536536db3f8020b6a96a1870cad9f1bdd00e6491"
+    },
+    {
+      "path": "assets/fonts/ModernEra-Medium.ttf",
+      "sha1": "2231f68bffa94e8616077b9de28f5d41eee4a0ba"
+    },
+    {
+      "path": "assets/fonts/TiemposHeadline-Regular.ttf",
+      "sha1": "21a199099240c6aba3db0455963b82a3714680c7"
+    },
+    {
+      "path": "assets/fonts/TiemposHeadline-Semibold.ttf",
+      "sha1": "a33247c4f3b4a3f9017a842680a8123f9a50b1db"
+    }
+  ]
+}
