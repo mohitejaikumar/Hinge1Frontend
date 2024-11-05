@@ -28,8 +28,8 @@ const PhoneNumber = ({navigation}:PhoneNumberProps) => {
 
     const handlePhoneNumberChange = async(text:string)=>{
         setPhoneNumber(text.trim());
-        await saveRegistrationProgress('PhoneNumber',text.trim());
         if(text.trim().length === 10){
+            await saveRegistrationProgress('PhoneNumber',text.trim());
             setDisabled(false);
         }
         else{
@@ -60,7 +60,7 @@ const PhoneNumber = ({navigation}:PhoneNumberProps) => {
                 disabled={disabled}
                 onPress={()=>{
                     if(disabled)return;
-                    navigation.replace('NameScreen')
+                    navigation.replace('BirthDateScreen')
                 }}
             />
         </SafeAreaView>

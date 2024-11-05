@@ -43,13 +43,14 @@ const ImagesScreen = ({navigation}:ImagesScreenProps) => {
             } else if(res.errorCode) {
                 console.log('ImagePickerError: ', res.errorMessage)
             } else {
+                console.log(res.assets![0].uri);
                 if(images[index] === ''){
                     setCount(ct=>ct+1);
                 }
                 setImages(prev=>{
                     const newImages = [...prev];
                     //@ts-ignore
-                    newImages[index] = res.assets![0].base64;
+                    newImages[index] = res.assets![0].uri;
                     return newImages;
                 })
             }
@@ -86,7 +87,7 @@ const ImagesScreen = ({navigation}:ImagesScreenProps) => {
                                 <View style={{width:'100%',height:'100%',position:'relative'}}>
                                     <Image
                                         source={{
-                                            uri:`data:image/*;base64,${image}`
+                                            uri:`${image}`
                                         }}
                                         style={{
                                             width:'100%',

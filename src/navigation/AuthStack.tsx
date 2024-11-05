@@ -143,9 +143,7 @@ const AuthStack = () => {
             <Stack.Screen
             name="WorkScreen"
             component={WorkScreen}
-            options={{headerTitleStyle:{
-                fontFamily:'ModernEra-Bold',
-            }}}           
+            options={{headerShown:false}}              
             />
             <Stack.Screen
             name="FinalScreen"

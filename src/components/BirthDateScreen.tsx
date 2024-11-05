@@ -5,12 +5,13 @@ import NextButton from './NextButton';
 import { AuthStackParamList } from '../navigation/AuthStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Entypo from 'react-native-vector-icons/Entypo'
+import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
 
 type BirthDateScreenProps = NativeStackScreenProps<AuthStackParamList, 'BirthDateScreen'>;
 
 
 const BirthDateScreen = ({navigation}:BirthDateScreenProps) => {
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(true);
     const [day, setDay] = useState('');
     const [month, setMonth] = useState('');
     const [year, setYear] = useState('');
@@ -35,10 +36,35 @@ const BirthDateScreen = ({navigation}:BirthDateScreenProps) => {
     const handleYearChange = (text:string) => {
         setYear(text);
     };
+    const getDate = async()=>{
+        const date = await getRegistrationProgress('DateOfBirth');
+        if(date){
+            const dateArr = date.split('-');
+            setDay(dateArr[0]);
+            setMonth(dateArr[1]);
+            setYear(dateArr[2]);
+        }
+    }
+    
+    useEffect(()=>{
+        getDate();
+    },[])
 
     useEffect(()=>{
         dayRef.current?.focus();
     },[])
+    
+    const setDateStorage = async()=>{
+        await saveRegistrationProgress('DateOfBirth', `${day}-${month}-${year}`);
+    }
+    useEffect(()=>{
+        
+        if(day.length ==2 && month.length ==2 && year.length ===4){
+            setDateStorage();
+            setDisabled(false);
+        }
+
+    },[day,month,year])
     
     return (
         <SafeAreaView style={styles.container}>

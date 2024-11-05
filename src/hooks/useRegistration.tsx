@@ -21,12 +21,12 @@ export const RegistrationContext = createContext<{
 });
 
 export const RegistrationProvider = ({children}:{children:React.ReactNode}) => {
-    const [storageImages, setStorageImages] = useState<string[]>([]);
+    const [storageImages, setStorageImages] = useState<string[]>(["","","","","",""]);
     const [behaviours, setBehaviours] = useState<{
         question:string,
         answer:string
     }[]>([]);
-    
+
     return (
         <RegistrationContext.Provider value={{storageImages,setStorageImages,behaviours,setBehaviours}}>
             {children}

@@ -4,6 +4,9 @@ import { BottomTabsParamList } from '../navigation/MainStack';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import ProfileDisplay from './ProfileDisplay';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useToken } from '../hooks/useToken';
 
 
 type HomeScreenProps = NativeStackScreenProps<BottomTabsParamList, 'Home'>;
@@ -43,6 +46,32 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
             }
         ]
     }
+    const [matches , setMatches] = useState([]);
+    const [loading , setLoading] = useState(false);
+    const {token} = useToken();
+    
+    const getMatch = async()=>{
+
+        setLoading(true);
+        try{
+            const response = await axios.get('http://10.81.4.206:3000/users/matches',{
+                headers:{
+                    authorization: token
+                }
+            });
+            setMatches(response.data);
+            console.log(response.data[0]);
+        }
+        catch(err){
+            console.error(err);
+        }
+        setLoading(false);
+    }
+
+
+    useEffect(()=>{
+        getMatch();
+    },[])
 
     
     return (

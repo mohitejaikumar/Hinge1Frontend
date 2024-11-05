@@ -4,10 +4,12 @@ import AuthStack from './AuthStack';
 import MainStack from './MainStack';
 import { NavigationContainer } from '@react-navigation/native';
 import { RegistrationProvider } from '../hooks/useRegistration';
+import { useToken } from '../hooks/useToken';
 
 
 const AppStack = () => {
-    const [token, setToken] = useState<null | string>("");
+    
+    const {token} = useToken();
 
     return (
         <NavigationContainer>
