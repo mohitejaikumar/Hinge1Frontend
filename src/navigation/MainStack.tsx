@@ -41,6 +41,7 @@ export type LikesStackParamList = {
         image?:{
             url:string
         },
+        goToNext:()=>void
     }
 }
 

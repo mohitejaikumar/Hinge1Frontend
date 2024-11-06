@@ -1,5 +1,5 @@
-import { Button, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
+import { ActivityIndicator, Button, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LikesStackParamList } from '../navigation/MainStack';
 import ProfileDisplay from './ProfileDisplay';
@@ -7,53 +7,94 @@ import LikedComponent from './LikedComponent';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Modal from "react-native-modal";
+import { AnswerLiked, ImageLiked } from './CustomizedLikedComponent';
+import { Profile } from '../types';
+import { useFocusEffect } from '@react-navigation/native';
+import axios from 'axios';
+import { useToken } from '../hooks/useToken';
 
 type DecideLikeProps = NativeStackScreenProps<LikesStackParamList, 'DecideLike'>;
 
 const DecideLike = ({navigation, route}:DecideLikeProps) => {
-    const profile = {
-        id:1,
-        first_name:'Kartik',
-        last_name:'Sharma',
-        gender:'Male',
-        age:19,
-        home_town:'Maharashtra',
-        religion:'Hindu',
-        open_for:'Long-term relationship',
-        preferred_gender:'Female',
-        images:[
-            'https://plus.unsplash.com/premium_photo-1672239496290-5061cfee7ebb?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            ,'https://plus.unsplash.com/premium_photo-1664015982598-283bcdc9cae8?q=80&w=1965&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            ,'https://images.unsplash.com/photo-1508243771214-6e95d137426b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            ,'https://images.unsplash.com/photo-1503443207922-dff7d543fd0e?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            ,'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            ,'https://plus.unsplash.com/premium_photo-1677553954020-68ac75b4e1b4?q=80&w=1933&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-        ],
-        prompts:[
-            {
-                question:'A life goal of mine',
-                answer:'I want to become an successful businessman'
-            },
-            {
-                question:'I feel most supported when',
-                answer:'Someone can sit with me 😇 ❤️'
-            },
-            {
-                question:'I want someone who',
-                answer:'Can understand me ❤️'
-            }
-        ]
-    }
+    
+    const {token} = useToken();
+    const [profile, setProfile] = useState<Profile | null>(null)
     const [isModalVisible , setIsModalVisible] = useState(false);
+    const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
+    const handleChat = async()=>{
+        // Chat logic
+        // add user to match list
+        try{
+            await axios.post('http://10.81.4.206:3000/users/accept',{
+                acceptedUserId:route.params?.id
+            },{
+                headers:{
+                    authorization:token
+                }
+            })
+            // shift to next
+            route.params?.goToNext();
+            navigation.goBack();
+            navigation.goBack();
+            setIsModalVisible(!isModalVisible);
+        }
+        catch(err){
+            console.error(err);
+        }
+        
 
-    const handleChat = ()=>{
+    }
+    const handleCross = async()=>{
+
+        try{
+            await axios.post('http://10.81.4.206:3000/users/reject',{
+                rejectedUserId:route.params?.id
+            },{
+                headers:{
+                    authorization:token
+                }
+            })
+            // shift to next
+            route.params?.goToNext();
+            navigation.goBack();
+        }
+        catch(err){
+            console.error(err);
+        }
+    }
+    const handleCancel = ()=>{
         setIsModalVisible(!isModalVisible);
     }
+
+    const getProfile = async()=>{
+        setLoading(true);
+        try{
+            const response = await axios.get(`http://10.81.4.206:3000/users/profile/${route.params?.id}`,{
+                headers:{
+                    authorization:token
+                }
+            });
+            if(response.data){
+                setProfile(response.data);
+            }
+        }
+        catch(err){
+            console.error(err);
+            navigation.goBack();
+        }
+        setLoading(false);
+    }
+
+    
+    useEffect(()=>{
+        getProfile();
+    },[])
 
     return (
         <>
         <ScrollView style={styles.container}>
-            <View style={{position:'relative'}}>
+            {profile && !loading && <View style={{position:'relative'}}>
                 { route.params?.likedType === 'photo' ?
                     <ImageLiked url={route.params?.image?.url!}/>
                     :
@@ -68,7 +109,16 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
                     />
                 </View>
             </View>
-            <ProfileDisplay profile={profile} show={false}/>
+            }
+            {loading && 
+                    <View style={{marginTop:'60%'}}>
+                        <ActivityIndicator
+                            size="large"
+                            color="#66295B"
+                        />
+                    </View>
+            }
+            {profile && !loading && <ProfileDisplay profile={profile} show={false}/>}
         </ScrollView>
         <Modal 
             isVisible={isModalVisible}
@@ -95,7 +145,7 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
                     placeholderTextColor="#A4B0BD"
                     multiline={true}
                     editable={true}
-                    
+                    onChangeText={(text)=>setMessage(text)}
                     style={{
                         height:50,
                         backgroundColor:'#fff',
@@ -130,7 +180,7 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
                 </Pressable>
                 <Pressable 
                     
-                    onPress={handleChat}
+                    onPress={handleCancel}
                     style={{
                         marginTop:15,
                         width:'100%',
@@ -151,7 +201,7 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
             </View>
         </Modal>
         <Pressable
-            // onPress={handleCross}
+            onPress={handleCross}
             style={{
                 position: 'absolute',
                 bottom: 15,
@@ -195,29 +245,6 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
 }
 
 
-const ImageLiked = ({url}:{url:string})=>{
-    return (
-        <View>
-            <Image
-                source={{
-                    uri:url
-                }}
-                style={styles.imageStyle}
-            />
-        </View>
-    )
-}
-
-const AnswerLiked = ({question,answer}:{question:string,answer:string})=>{
-    return (
-        <View style={styles.promptContainer}>
-            <Text style={styles.promptQuestion}>{question}</Text>
-            <Text style={styles.promptAnswer}>{answer}</Text>
-        </View>
-    )
-}
-
-
 export default DecideLike
 
 const styles = StyleSheet.create({
@@ -226,34 +253,5 @@ const styles = StyleSheet.create({
         backgroundColor:'#F2F1EF',
         position:'relative',
         paddingHorizontal:25,
-    },
-    promptContainer:{
-        display:'flex',
-        height:'auto',
-        gap:10,
-        borderRadius:10,
-        backgroundColor:'white',
-        marginTop:20,
-        marginBottom:10,
-        paddingLeft:15,
-        paddingRight:30,
-        paddingVertical:40,
-    },
-    promptQuestion:{
-        fontFamily:'ModernEra-Bold',
-        fontSize:15,
-    },
-    promptAnswer:{
-        fontFamily:'TiemposHeadline-Semibold',
-        fontSize:25,
-        lineHeight:30,
-    },
-    imageStyle:{
-        width:'100%',
-        height:150,
-        marginTop:20,
-        marginBottom:10,
-        borderRadius:10,
-        resizeMode:'cover',
     },
 })

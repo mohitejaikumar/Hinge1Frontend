@@ -1,32 +1,55 @@
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomTabsParamList, MainStackParamList } from '../navigation/MainStack';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import { useToken } from '../hooks/useToken';
 
+
+interface People{
+    id:number;
+    first_name:string;
+    images:{
+        id:number,
+        url:string
+    }[],
+    chats_sent:{
+        message:string,
+        created_at:Date,
+    }[],
+    chats_received:{
+        message:string,
+        created_at:Date,
+    }[]
+}
 
 const ChatScreen = () => {
     const navigation = useNavigation();
-    const people =[
-        {
-            id:1,
-            first_name:'kartik',
-            image:'https://images.unsplash.com/photo-1503443207922-dff7d543fd0e?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            last_messsage:'Hey, I like your photo!ewfwfwefewfewfefwfwffwfwefwfewf'
-        },
-        {
-            id:1,
-            first_name:'kartik',
-            image:'https://images.unsplash.com/photo-1503443207922-dff7d543fd0e?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            last_messsage:'Hey, I like your photo!ewfwfwefewfewfefwfwffwfwefwfewf'
-        },
-        {
-            id:1,
-            first_name:'kartik',
-            image:'https://images.unsplash.com/photo-1503443207922-dff7d543fd0e?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            last_messsage:'Hey, I like your photo!ewfwfwefewfewfefwfwffwfwefwfewf'
+    const {token} = useToken();
+    const [people, setPeople] = useState<People[]>([]);
+
+
+    const getPeople = async ()=>{
+        try{
+            const response = await axios.get('http://10.81.4.206:3000/users/allMatches',{                
+                headers:{
+                    authorization:token
+                }
+            });
+            setPeople(response.data.people);
         }
-    ]
+        catch(err){
+            console.error(err);
+        }
+    }
+    
+    useFocusEffect(
+        useCallback(()=>{
+                getPeople();
+        },[])
+    )
+
     return (
         <ScrollView style={styles.container}>
             <Text style={styles.largeText}>
@@ -62,7 +85,7 @@ const ChatScreen = () => {
                             >
                                 <Image 
                                     source={{
-                                        uri:person.image
+                                        uri:person.images[0].url
                                     }}
                                     style={{
                                         width:80,
@@ -73,7 +96,11 @@ const ChatScreen = () => {
                                 />
                                 <View>
                                     <Text style={{fontFamily:'ModernEra-Bold' , fontSize:20}}>{person.first_name}</Text>
-                                    <Text>{person.last_messsage.slice(0,20)}..</Text>
+                                    {person.chats_sent[0]?.created_at > person.chats_received[0]?.created_at ?
+                                        <Text>{person.chats_sent[0]?.message.slice(0,25)}..</Text>
+                                        :
+                                        <Text>{person.chats_received[0]?.message.slice(0,25)}..</Text>
+                                    }
                                 </View>
                             </Pressable>
                         )

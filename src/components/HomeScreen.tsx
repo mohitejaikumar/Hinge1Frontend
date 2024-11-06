@@ -1,57 +1,29 @@
-import {  Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {  ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomTabsParamList } from '../navigation/MainStack';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import ProfileDisplay from './ProfileDisplay';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useToken } from '../hooks/useToken';
+import { Profile } from '../types';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 
 type HomeScreenProps = NativeStackScreenProps<BottomTabsParamList, 'Home'>;
 
+
+
 const HomeScreen = ({route,navigation}:HomeScreenProps) => {
 
-    const profile = {
-        id:1,
-        first_name:'Kartik',
-        last_name:'Sharma',
-        gender:'Male',
-        age:19,
-        home_town:'Maharashtra',
-        religion:'Hindu',
-        open_for:'Long-term relationship',
-        preferred_gender:'Female',
-        images:[
-            'https://plus.unsplash.com/premium_photo-1672239496290-5061cfee7ebb?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            ,'https://plus.unsplash.com/premium_photo-1664015982598-283bcdc9cae8?q=80&w=1965&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            ,'https://images.unsplash.com/photo-1508243771214-6e95d137426b?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            ,'https://images.unsplash.com/photo-1503443207922-dff7d543fd0e?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            ,'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            ,'https://plus.unsplash.com/premium_photo-1677553954020-68ac75b4e1b4?q=80&w=1933&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-        ],
-        prompts:[
-            {
-                question:'A life goal of mine',
-                answer:'I want to become an successful businessman'
-            },
-            {
-                question:'I feel most supported when',
-                answer:'Someone can sit with me 😇 ❤️'
-            },
-            {
-                question:'I want someone who',
-                answer:'Can understand me ❤️'
-            }
-        ]
-    }
-    const [matches , setMatches] = useState([]);
+    const [matches , setMatches] = useState<Profile[]>([]);
     const [loading , setLoading] = useState(false);
     const {token} = useToken();
+    const [tried, setTried] = useState(false);
     
     const getMatch = async()=>{
-
         setLoading(true);
         try{
             const response = await axios.get('http://10.81.4.206:3000/users/matches',{
@@ -59,8 +31,13 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
                     authorization: token
                 }
             });
-            setMatches(response.data);
-            console.log(response.data[0]);
+            console.log(JSON.stringify(response.data));
+            if(response.data){
+            
+                setMatches((prev)=>[...prev,...response.data]);
+                setTried(true);
+            }
+            
         }
         catch(err){
             console.error(err);
@@ -69,10 +46,84 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
     }
 
 
-    useEffect(()=>{
-        getMatch();
-    },[])
+    useFocusEffect(
+        useCallback(()=>{
+            if(matches.length === 0 && !tried){
+                getMatch();
+            }
+        },[matches , tried])
+    );
+    
+    
 
+    const onLike = async(userId:number, likedType:'photo'|'answer', id:number , comment:string)=>{
+        console.log('liked' , userId , likedType , id , comment);
+        
+        // like api call
+        if(likedType === 'photo'){
+            try{
+                await axios.post('http://10.81.4.206:3000/users/imageLiked',{
+                    likedUserId:userId,
+                    imageId:id,
+                    comment:comment
+                },{
+                    headers:{
+                        authorization:token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                // shift to next
+                setMatches((prev)=>prev.slice(1));
+                setTried(false);
+            }
+            catch(err){
+                //@ts-ignore
+                console.error(err.message);
+            }
+        }
+        else{
+            try{
+                await axios.post('http://10.81.4.206:3000/users/behaviourLiked',{
+                    likedUserId:userId,
+                    behaviourId:id,
+                    comment:comment
+                },{
+                    headers:{
+                        authorization:token
+                    }
+                });
+
+                // shift to next
+                setMatches((prev)=>prev.slice(1));
+                setTried(false);
+            }
+            catch(err){
+                console.error(err);
+            }
+        }
+    }
+
+    const onReject = async(userId:number)=>{
+        console.log('rejected');
+        
+        // reject api call 
+        try{
+            await axios.post('http://10.81.4.206:3000/users/reject',{
+                rejectedUserId:userId
+            },{
+                headers:{
+                    authorization:token
+                }
+            })
+            // shift to next
+            setMatches((prev)=>prev.slice(1));
+            setTried(false);
+        }
+        catch(err){
+            console.error(err);
+        }
+    }
+    
     
     return (
         <>
@@ -86,30 +137,46 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
                         <Text style={{fontFamily:'ModernEra-Medium'}}>One like goes a long way.</Text>
                     </View>
                 </View>
-                <ProfileDisplay profile={profile} show={true}/>
+                { !loading && matches.length === 0 &&
+                    <View style={{marginTop:'70%'}}>
+                        <Text style={{fontFamily:'ModernEra-Bold' , fontSize:30 , textAlign:'center'}}>No Match Found 🥺</Text>
+                    </View>
+                }  
+                {loading && 
+                    <View style={{marginTop:'60%'}}>
+                        <ActivityIndicator
+                            size="large"
+                            color="#66295B"
+                        />
+                    </View>
+                }
+                {!loading && matches.length >0 && 
+                    <ProfileDisplay profile={matches[0]} show={true} onLike={onLike}/>
+                }
 
         </ScrollView>
-        <Pressable
-            // onPress={handleCross}
-            style={{
-                position: 'absolute',
-                bottom: 15,
-                left: 30,
-                backgroundColor: 'white',
-                width: 60,
-                height: 60,
-                borderRadius: 100,
-                justifyContent: 'center',
-                alignItems: 'center',
-                shadowColor: '#000000',
-                shadowOffset: {width: 1, height: 2},
-                shadowOpacity: 0.25,
-                shadowRadius: 3.4,
-                elevation: 5,
-            }}>
-            <MaterialCommunityIcons name="sword-cross" size={30} color="#000000" />
-        </Pressable>
-        
+        { !loading && matches.length > 0 &&
+            <Pressable
+            onPress={()=>onReject(matches[0].id)}
+                style={{
+                    position: 'absolute',
+                    bottom: 15,
+                    left: 30,
+                    backgroundColor: 'white',
+                    width: 60,
+                    height: 60,
+                    borderRadius: 100,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    shadowColor: '#000000',
+                    shadowOffset: {width: 1, height: 2},
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.4,
+                    elevation: 5,
+                }}>
+                <MaterialCommunityIcons name="sword-cross" size={30} color="#000000" />
+            </Pressable>
+        }
         </>
     );
 }

@@ -51,6 +51,7 @@ const FinalScreen = () => {
         const occupation = await getRegistrationProgress('Occupation');
         const region = await getRegistrationProgress('Region');
         const location = await getRegistrationProgress('Location');
+        const datingType = await getRegistrationProgress('DatingType')
         
         const userData = {
             firstName:firstName,
@@ -68,6 +69,7 @@ const FinalScreen = () => {
             latitude:String(JSON.parse(location).latitude),
             longitude:String(JSON.parse(location).longitude),
             behaviours:behaviours,
+            dating_type:datingType,
         }
 
         try{
@@ -85,16 +87,18 @@ const FinalScreen = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             })
+            setisLoading(false);
+            cofiRef.current?.start();
+            await new Promise((resolve)=> setTimeout(resolve, 3000));
             setToken(response.data.token);
             // success
-            cofiRef.current?.start();
         }
         catch(err){
             //@ts-ignore
             console.log(JSON.stringify(err.message));
             setError(true);
+            setisLoading(false);
         }
-        setisLoading(false);
     }
 
     useEffect(()=>{

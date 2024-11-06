@@ -1,17 +1,48 @@
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import { MainStackParamList } from '../navigation/MainStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import { useSocket } from '../hooks/useSocket';
+import { useToken } from '../hooks/useToken';
+import axios from 'axios';
 
 type MainChatScreenProps = NativeStackScreenProps<MainStackParamList, 'MainChatScreen'>;
+interface Message{
+    id?:number,
+    message:string,
+    created_at:Date
+    receiver_id:number
+    sender_id:number
+}
 
 const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
     
     const [inputHeight,setInputHeight] = useState(30);
-    const [messages, setMessages] = useState([
-        
-    ])
+    const [messages, setMessages] = useState<Message[]>([])
+    const [message, setMessage] = useState('');
+    const socket = useSocket();
+    const {token} = useToken();
+    const scrollRef = useRef<ScrollView>(null);
+    
+    const getAllChats = async()=>{
+        try{
+            const response = await axios.get(`http://10.81.4.206:3000/users/chats/${route.params.id}`,{                
+                headers:{
+                    authorization:token
+                }
+            });
+            setMessages(response.data);
+            scrollRef.current?.scrollToEnd({animated:true});
+        }
+        catch(err){
+            console.error(err);
+        }
+    }
+
+    useEffect(()=>{
+        getAllChats();
+    },[]);
 
     useEffect(()=>{
         navigation.setOptions({
@@ -22,9 +53,73 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
             }
         })
     },[])
+    useEffect(()=>{
+        if(socket){
+            socket.onmessage = (event)=>{
+                const data = JSON.parse(event.data);
+                console.log(data);
+                if(data.type === 'chat' && data.payload.senderId === route.params?.id){
+                    setMessages((prev)=>[...prev,{
+                        message:data.payload.message,
+                        created_at:new Date(),
+                        receiver_id:34,
+                        sender_id:route.params?.id
+                    }]);
+                }
+            }
+        }
+    },[socket])
+
+    useEffect(()=>{
+        scrollRef.current?.scrollToEnd({animated:true});
+    },[messages])
+
+    const handleSend = ()=>{
+        if(socket){
+            setMessages((prev)=>[...prev,{
+                message:message,
+                created_at:new Date(),
+                receiver_id:route.params?.id,
+                sender_id:34
+            }]);
+            socket.send(JSON.stringify({
+                type:'chat',
+                payload:{
+                    token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM0fQ.1FEb5TV31P_veW1U2uE22qdl6OIBId2KLEcabGmVyEk",
+                    receiverId:route.params?.id,
+                    message:message
+                }
+            }))
+            setMessage('');
+        }
+    }
+
+    const messageChange = (text:string)=>{
+        setMessage(text);
+    }
+
     return (
         <>
-        <ScrollView style={styles.container}>
+        <ScrollView 
+            style={styles.container} 
+            ref={scrollRef}
+            showsVerticalScrollIndicator={true}
+        >
+
+            {messages.map((text,index)=>{
+                return (
+                    (text.sender_id === route.params?.id) ? 
+                    <View key={index} style={{flexDirection:'row',justifyContent:'flex-start' ,marginTop:10 , }}>
+                        <Text style={{width:'40%',fontFamily:'ModernEra-Medium' , fontSize:20}}>{text.message}</Text>
+                    </View>
+                    :
+                    <View key={index} style={{flexDirection:'row' , justifyContent:'flex-end' , marginTop:10 , }}>
+                        <Text style={{width:'40%',fontFamily:'ModernEra-Medium' , fontSize:20}}>{text.message}</Text>
+                    </View>
+                )
+            })
+
+            }
             
         </ScrollView>
         <View style={styles.bottomBar}>
@@ -33,6 +128,8 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
                     placeholderTextColor="#7f8c8d"
                     multiline={true}
                     numberOfLines={4}
+                    value={message}
+                    onChangeText={messageChange}
                     scrollEnabled={true}
                     onContentSizeChange={(e)=>{
                         setInputHeight(e.nativeEvent.contentSize.height);
@@ -40,6 +137,7 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
                     style={{
                         fontFamily:'ModernEra-Medium',
                         color:'#000000',
+                        backgroundColor:'#fff',
                         fontSize:18,
                         alignSelf:'stretch',
                         paddingHorizontal:25,
@@ -51,22 +149,23 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
                         borderRadius:100,
                     }}
                 />
-                <View
-                style={{
-                    width:50,
-                    height:50,
-                    backgroundColor:'#66295B',
-                    borderRadius:100,
-                    justifyContent:'center',
-                    alignItems:'center',
-                }}
+                <Pressable
+                    onPress={handleSend}
+                    style={{
+                        width:50,
+                        height:50,
+                        backgroundColor:'#66295B',
+                        borderRadius:100,
+                        justifyContent:'center',
+                        alignItems:'center',
+                    }}
                 >
                     <AntDesign
                         name="arrowup"
                         size={25}
                         color="white"
                     />
-                </View>
+                </Pressable>
                 
         </View>
         </>
@@ -80,6 +179,7 @@ const styles = StyleSheet.create({
         flex:1,
         position:'relative',
         paddingHorizontal:25,
+        marginBottom:"20%"
     },
     bottomBar:{
         position:'absolute',
