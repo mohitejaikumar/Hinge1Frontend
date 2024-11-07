@@ -192,10 +192,11 @@ const ProfileDisplay = ({
         <Modal 
             isVisible={isModalVisible}
             
+            
         >
             <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{ flex: 1 , marginTop:'50%' , backgroundColor:'#ecf0f1', borderRadius:10, paddingHorizontal:8}}>
+            style={{  marginTop:'10%' , backgroundColor:'#ecf0f1', borderRadius:10, paddingHorizontal:10 , width:'100%'}}>
                 <Text style={styles.firstName}>{profile.first_name}</Text>
                 <View style={{position:'relative'}}>
                     { likedType === 'photo' ?
@@ -241,7 +242,7 @@ const ProfileDisplay = ({
                     <Text 
                     style={{
                         fontFamily:'ModernEra-Bold' ,
-                        backgroundColor:'#F5BCBA',
+                        backgroundColor:'#f7d7cd',
                         textAlign:'center',
                         color:'#000000',
                         borderRadius:100,
@@ -254,7 +255,7 @@ const ProfileDisplay = ({
                     
                     onPress={handleCancel}
                     style={{
-                        marginTop:15,
+                        marginVertical:10,
                         width:'100%',
                         paddingHorizontal:30,
                     }} 

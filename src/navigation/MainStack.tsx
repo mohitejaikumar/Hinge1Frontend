@@ -19,7 +19,8 @@ export type MainStackParamList = {
     Main:undefined
     MainChatScreen:{
         id:number,
-        first_name:string
+        first_name:string,
+        image:string
     },
 }
 

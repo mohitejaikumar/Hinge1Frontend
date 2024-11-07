@@ -7,6 +7,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation'
 import { getRegistrationProgress, saveRegistrationProgress } from '../../registrationUtil';
+import Config from 'react-native-config';
 
 type LocationScreenProps = NativeStackScreenProps<AuthStackParamList, 'LocationScreen'>;
 
@@ -59,7 +60,7 @@ const LocationScreen = ({navigation}:LocationScreenProps) => {
             
             try{
                 const response = await fetch(
-                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyATUxdKZEwD_PcaAmQSwtz-wodXzHRE2wo`,
+                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${Config.GOOGLE_MAPS_API_KEY}`,
                 )
                 const data = await response.json();
                 console.log('date', data);

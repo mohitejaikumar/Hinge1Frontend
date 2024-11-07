@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { MainStackParamList } from '../navigation/MainStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -6,6 +6,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import { useSocket } from '../hooks/useSocket';
 import { useToken } from '../hooks/useToken';
 import axios from 'axios';
+import { ChatBubble } from './ChatBubble';
 
 type MainChatScreenProps = NativeStackScreenProps<MainStackParamList, 'MainChatScreen'>;
 interface Message{
@@ -50,7 +51,37 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
             headerTitleStyle:{
                 fontFamily:'ModernEra-Bold',
                 fontSize:25,
-            }
+            },
+            headerLeft:()=>{
+                return (
+                    <>   
+                        <Pressable
+                            onPress={()=>{
+                                navigation.replace('Main');
+                            }}
+                        >
+                            <AntDesign
+                                name="arrowleft"
+                                size={30}
+                                color="#000000"
+                            />
+                        </Pressable>
+                        <Image
+                            source={{
+                                uri:route.params?.image
+                            }}
+                            style={{
+                                width:50,
+                                height:50,
+                                borderRadius:100,
+                                resizeMode:'cover',
+                                margin:10
+                            }}
+                        />
+                    </>
+                )
+            },
+            
         })
     },[])
     useEffect(()=>{
@@ -85,7 +116,7 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
             socket.send(JSON.stringify({
                 type:'chat',
                 payload:{
-                    token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM0fQ.1FEb5TV31P_veW1U2uE22qdl6OIBId2KLEcabGmVyEk",
+                    token:token,
                     receiverId:route.params?.id,
                     message:message
                 }
@@ -105,17 +136,12 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
             ref={scrollRef}
             showsVerticalScrollIndicator={true}
         >
-
             {messages.map((text,index)=>{
                 return (
                     (text.sender_id === route.params?.id) ? 
-                    <View key={index} style={{flexDirection:'row',justifyContent:'flex-start' ,marginTop:10 , }}>
-                        <Text style={{width:'40%',fontFamily:'ModernEra-Medium' , fontSize:20}}>{text.message}</Text>
-                    </View>
+                    <ChatBubble key={index} message={text.message} isSender={false} />
                     :
-                    <View key={index} style={{flexDirection:'row' , justifyContent:'flex-end' , marginTop:10 , }}>
-                        <Text style={{width:'40%',fontFamily:'ModernEra-Medium' , fontSize:20}}>{text.message}</Text>
-                    </View>
+                    <ChatBubble key={index} message={text.message} isSender={true} />
                 )
             })
 

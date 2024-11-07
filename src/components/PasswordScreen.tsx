@@ -11,7 +11,7 @@ import Feather from 'react-native-vector-icons/Feather'
 type PasswordScreenProps = NativeStackScreenProps<AuthStackParamList, 'PasswordScreen'>;
 
 const PasswordScreen = ({navigation}:PasswordScreenProps) => {
-  const [disabled, setDisabled] = useState(true);
+    const [disabled, setDisabled] = useState(true);
     const passwordRef = useRef<TextInput>(null);
     const [password, setPassword] = useState('');
     

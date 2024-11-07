@@ -1,10 +1,10 @@
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import React, { useCallback, useState } from 'react';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { BottomTabsParamList, MainStackParamList } from '../navigation/MainStack';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { useToken } from '../hooks/useToken';
+import { BottomTabsParamList } from '../navigation/MainStack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 
 interface People{
@@ -23,9 +23,9 @@ interface People{
         created_at:Date,
     }[]
 }
-
-const ChatScreen = () => {
-    const navigation = useNavigation();
+type ChatScreenProps = NativeStackScreenProps<BottomTabsParamList, 'Chat'>;
+const ChatScreen = ({navigation}:ChatScreenProps) => {
+    
     const {token} = useToken();
     const [people, setPeople] = useState<People[]>([]);
 
@@ -74,12 +74,12 @@ const ChatScreen = () => {
                                 key={index}
                                 onPress={()=>{
                                     //@ts-ignore
-                                    navigation.navigate('MainChatScreen',
+                                    navigation.push('MainChatScreen',
                                         {
                                             id:person.id , 
-                                            first_name:person.first_name
+                                            first_name:person.first_name,
+                                            image:person.images[0].url
                                         },
-                                        
                                     )
                                 }}
                             >

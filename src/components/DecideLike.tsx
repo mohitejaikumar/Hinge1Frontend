@@ -24,10 +24,16 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
     const [loading, setLoading] = useState(false);
     const handleChat = async()=>{
         // Chat logic
-        // add user to match list
+        setIsModalVisible(!isModalVisible);
+        
+    }
+
+    const handleAccept = async()=>{
         try{
+            // add user to match list
             await axios.post('http://10.81.4.206:3000/users/accept',{
-                acceptedUserId:route.params?.id
+                acceptedUserId:route.params?.id,
+                message:message
             },{
                 headers:{
                     authorization:token
@@ -37,13 +43,12 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
             route.params?.goToNext();
             navigation.goBack();
             navigation.goBack();
-            setIsModalVisible(!isModalVisible);
         }
         catch(err){
-            console.error(err);
+            //@ts-ignore
+            console.error(err.message);
         }
-        
-
+        setIsModalVisible(!isModalVisible);
     }
     const handleCross = async()=>{
 
@@ -124,7 +129,7 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
             isVisible={isModalVisible}
             
         >
-            <View style={{ flex: 1 , marginTop:'50%' , backgroundColor:'#ecf0f1', borderRadius:10, paddingHorizontal:8}}>
+            <View style={{ marginTop:'10%' , backgroundColor:'#ecf0f1', borderRadius:10, paddingHorizontal:8}}>
                 <View style={{position:'relative'}}>
                     { route.params?.likedType === 'photo' ?
                         <ImageLiked url={route.params?.image?.url!}/>
@@ -158,8 +163,7 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
                     }}
                 />
                 <Pressable 
-                    
-                    onPress={handleChat}
+                    onPress={handleAccept}
                     style={{
                         marginTop:25,
                         width:'100%',

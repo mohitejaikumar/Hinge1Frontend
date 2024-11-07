@@ -52,7 +52,7 @@ export type AuthStackParamList = {
     },
     WorkScreen:undefined,
     PasswordScreen:undefined,
-    FinalScreen:undefined
+    FinalScreen:undefined,
 }
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();

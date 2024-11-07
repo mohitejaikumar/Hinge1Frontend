@@ -12,7 +12,7 @@ export const useSocket = ()=>{
             ws.send(JSON.stringify({
                 type:'join',
                 payload:{
-                    token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM0fQ.1FEb5TV31P_veW1U2uE22qdl6OIBId2KLEcabGmVyEk"
+                    token:token
                 }
             }))
         }
