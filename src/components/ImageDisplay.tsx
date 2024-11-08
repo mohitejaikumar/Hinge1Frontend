@@ -5,14 +5,7 @@ const ImageDisplay = ({url}:{url:string}) => {
     const [loading , setLoading] = useState(false);
     return (
         <>
-        {
-            loading && 
-            <View style={styles.loadingContaniner}>
-                <ActivityIndicator size="large" color="#66295B" />
-            </View>
-            
-        }{
-            !loading && 
+        
             <Image
                 source={{
                     uri:url
@@ -25,7 +18,7 @@ const ImageDisplay = ({url}:{url:string}) => {
                     setLoading(false);
                 }}
             />
-        }
+        
         </>
     )
 }
