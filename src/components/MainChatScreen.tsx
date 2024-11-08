@@ -88,7 +88,7 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
         if(socket){
             socket.onmessage = (event)=>{
                 const data = JSON.parse(event.data);
-                console.log(data);
+                // console.log(data);
                 if(data.type === 'chat' && data.payload.senderId === route.params?.id){
                     setMessages((prev)=>[...prev,{
                         message:data.payload.message,

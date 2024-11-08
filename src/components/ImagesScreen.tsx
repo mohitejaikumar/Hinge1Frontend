@@ -25,7 +25,7 @@ const ImagesScreen = ({navigation}:ImagesScreenProps) => {
 
     useEffect(()=>{
         if(count === 6){
-            console.log('saving images');
+            // console.log('saving images');
             setStorageImages(images);
             setDisabled(false);
         }
@@ -39,11 +39,11 @@ const ImagesScreen = ({navigation}:ImagesScreenProps) => {
             includeBase64: true
         }, async res => {
             if(res.didCancel) {
-                console.log('User cancelled')
+                // console.log('User cancelled')
             } else if(res.errorCode) {
-                console.log('ImagePickerError: ', res.errorMessage)
+                // console.log('ImagePickerError: ', res.errorMessage)
             } else {
-                console.log(res.assets![0].uri);
+                // console.log(res.assets![0].uri);
                 if(images[index] === ''){
                     setCount(ct=>ct+1);
                 }

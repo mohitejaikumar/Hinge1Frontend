@@ -97,7 +97,7 @@ const FinalScreen = () => {
         }
         catch(err){
             //@ts-ignore
-            console.log(JSON.stringify(err.message));
+            // console.log(JSON.stringify(err.message));
             setError(true);
             setisLoading(false);
         }

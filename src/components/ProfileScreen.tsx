@@ -31,7 +31,7 @@ const ProfileScreen = ({route,navigation}:ProfileScreenProps) => {
                     authorization: token
                 }
             });
-            console.log(JSON.stringify(response.data));
+            // console.log(JSON.stringify(response.data));
             if(response.data){
             
                 setProfile(response.data);

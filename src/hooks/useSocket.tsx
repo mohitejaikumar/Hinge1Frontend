@@ -18,7 +18,7 @@ export const useSocket = ()=>{
         }
         ws.onerror = (e) => {
             // an error occurred
-            console.log(e.message);
+            // console.log(e.message);
         };
         return ()=>{
             ws.close();

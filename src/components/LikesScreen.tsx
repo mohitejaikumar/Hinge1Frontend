@@ -44,7 +44,7 @@ const LikesScreen = ({navigation}:LikesScreenProps) => {
                     authorization:token
                 }
             });
-            console.log(response.data);
+            // console.log(response.data);
             setLikedBy(response.data);
             setTried(true);
         }

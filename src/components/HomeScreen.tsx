@@ -31,7 +31,7 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
                     authorization: token
                 }
             });
-            console.log(JSON.stringify(response.data));
+            // console.log(JSON.stringify(response.data));
             if(response.data){
             
                 setMatches((prev)=>[...prev,...response.data]);
@@ -57,7 +57,7 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
     
 
     const onLike = async(userId:number, likedType:'photo'|'answer', id:number , comment:string)=>{
-        console.log('liked' , userId , likedType , id , comment);
+        // console.log('liked' , userId , likedType , id , comment);
         
         // like api call
         if(likedType === 'photo'){
@@ -104,7 +104,7 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
     }
 
     const onReject = async(userId:number)=>{
-        console.log('rejected');
+        // console.log('rejected');
         
         // reject api call 
         try{

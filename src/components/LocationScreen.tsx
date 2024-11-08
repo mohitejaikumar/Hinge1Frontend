@@ -15,7 +15,7 @@ const LocationScreen = ({navigation}:LocationScreenProps) => {
     const [disabled, setDisabled] = useState(true);
     const mapRef = useRef<MapView>(null);
     const [location, setLocation] = useState({latitude:0, longitude:0});
-    console.log('location', location);
+    // console.log('location', location);
     const [region, setRegion] = useState("");
     
     const getLocation = async()=>{
@@ -36,10 +36,10 @@ const LocationScreen = ({navigation}:LocationScreenProps) => {
                 PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
             );
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log('Location permission granted');
+                // console.log('Location permission granted');
                 goToMyLocation();
             } else {
-                console.log('Location permission denied');
+                // console.log('Location permission denied');
             }
         }
     };
@@ -49,7 +49,7 @@ const LocationScreen = ({navigation}:LocationScreenProps) => {
             const { latitude, longitude } = position.coords;
             setLocation({ latitude, longitude });
             
-            console.log(position);
+            // console.log(position);
             // Animate map to user location
             mapRef.current?.animateToRegion({
             latitude,
@@ -63,10 +63,10 @@ const LocationScreen = ({navigation}:LocationScreenProps) => {
                 `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${Config.GOOGLE_MAPS_API_KEY}`,
                 )
                 const data = await response.json();
-                console.log('date', data);
+                // console.log('date', data);
                 if (data.results.length > 0) {
                 
-                    console.log(data.results[0].formatted_address);
+                    // console.log(data.results[0].formatted_address);
                     setRegion(data.results[0].formatted_address);
                     // save to async storage 
                     await saveRegistrationProgress('Region', JSON.stringify(data.results[0].formatted_address));
@@ -79,7 +79,7 @@ const LocationScreen = ({navigation}:LocationScreenProps) => {
             }
         },
         (error) => {
-            console.log(error);
+            // console.log(error);
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
         );
@@ -94,7 +94,7 @@ const LocationScreen = ({navigation}:LocationScreenProps) => {
         )
         .then(response => response.json())
         .then(async data => {
-            console.log('New location:', data);
+            // console.log('New location:', data);
             if (data.results.length > 0) {
             const addressComponents = data.results[0].address_components;
             let formattedAddress = '';

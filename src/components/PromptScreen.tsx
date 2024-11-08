@@ -29,7 +29,7 @@ const PromptScreen = ({navigation,route}:PromptScreenProps) => {
             
             if(newPrompt){
                 setPrompts(newPrompt);
-                console.log(route.params?.prompts);
+                // console.log(route.params?.prompts);
                 let isDone = true;
                 
                 for(let i=0;i<newPrompt.length;i++){
