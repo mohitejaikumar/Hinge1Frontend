@@ -11,19 +11,21 @@ const ImageDisplay = ({url}:{url:string}) => {
                 <ActivityIndicator size="large" color="#66295B" />
             </View>
             
+        }{
+            !loading && 
+            <Image
+                source={{
+                    uri:url
+                }}
+                style={styles.imageStyle}
+                onLoadStart={()=>{
+                    setLoading(true);
+                }}
+                onLoadEnd={()=>{
+                    setLoading(false);
+                }}
+            />
         }
-        <Image
-            source={{
-                uri:url
-            }}
-            style={styles.imageStyle}
-            onLoadStart={()=>{
-                setLoading(true);
-            }}
-            onLoadEnd={()=>{
-                setLoading(false);
-            }}
-        />
         </>
     )
 }
