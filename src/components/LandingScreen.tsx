@@ -9,6 +9,7 @@ import Config from 'react-native-config';
 import axios from 'axios';
 import { useToken } from '../hooks/useToken';
 import NotAccountImage from '../../assets/images/notAccount.jpg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 type LandingScreenProps = NativeStackScreenProps<AuthStackParamList, 'LandingScreen'>;
@@ -22,7 +23,7 @@ GoogleSignin.configure({
 const LandingScreen = ({navigation}:LandingScreenProps) => {
     const [siginIn , setSignIn] = useState(false);
     const [loading , setLoading] = useState(false);
-    const {setToken} = useToken();
+    const {setToken,token} = useToken();
     const [showDialog , setShowDialog] = useState(false);
     const [signInWithPassword, setSignInWithPassword] = useState(false);
     const [userEmail, setUserEmail] = useState('');
@@ -53,6 +54,7 @@ const LandingScreen = ({navigation}:LandingScreenProps) => {
                 });
                 if(response.data.token){
                     setToken(response.data.token);
+                    await AsyncStorage.setItem('token',response.data.token);
                 }
                 
             }
@@ -78,6 +80,7 @@ const LandingScreen = ({navigation}:LandingScreenProps) => {
             });
             if(response.data.token){
                 setToken(response.data.token);
+                await AsyncStorage.setItem('token',response.data.token);
             }
         }
         catch(error){
@@ -98,6 +101,7 @@ const LandingScreen = ({navigation}:LandingScreenProps) => {
 
     return (
         <SafeAreaView style={styles.continer}>
+            <Text>{token}</Text>
             <View style={styles.logoContainer}>
                 <Image
                     source={LogoImage}
@@ -134,7 +138,7 @@ const LandingScreen = ({navigation}:LandingScreenProps) => {
                 </View>
             }
             { signInWithPassword &&
-                <KeyboardAvoidingView style={{width:'90%' , gap:20}}>
+                <View style={{width:'90%' , gap:20}}>
                     {
                         showLoginError &&
                         <View style={{marginTop:20, width:'100%'}}>
@@ -165,7 +169,7 @@ const LandingScreen = ({navigation}:LandingScreenProps) => {
                     <Pressable onPress={handleBack} >
                         <Text style={[styles.button ,{color:'#000000'}]}>Back</Text>
                     </Pressable>
-                </KeyboardAvoidingView>
+                </View>
             }
             { showDialog &&
                 <View style={styles.dialogContainer}>

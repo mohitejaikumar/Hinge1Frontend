@@ -8,7 +8,7 @@ export const ChatBubble = ({ message, isSender }:{
     return (
         <View style={[styles.container, isSender ? styles.senderContainer : styles.receiverContainer]}>
             <View style={[styles.bubble, isSender ? styles.senderBubble : styles.receiverBubble]}>
-                <Text style={styles.messageText}>{message}</Text>
+                <Text style={[styles.messageText, isSender? {color:'white'} : {color:'black'}]}>{message}</Text>
                 {/* Arrow container */}
                 <View style={[styles.arrowContainer, isSender ? styles.senderArrowContainer : styles.receiverArrowContainer]}>
                 </View>
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     senderBubble: {
-        backgroundColor: '#E5E5EA', // WhatsApp sender green bubble
+        backgroundColor: '#66295B', // WhatsApp sender green bubble
         marginRight: 10,
     },
     receiverBubble: {
@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
         
     },
     senderArrowContainer: {
-        right: -10, // Position arrow to the right for sender
-        borderTopColor: '#E5E5EA',
+        right: -8, // Position arrow to the right for sender
+        borderTopColor: '#66295B',
     },
     receiverArrowContainer: {
-        left: -10, // Position arrow to the left for receiver
+        left: -8, // Position arrow to the left for receiver
         borderTopColor: '#E5E5EA',
     },
     

@@ -1,14 +1,14 @@
-import {  ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {  ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomTabsParamList } from '../navigation/MainStack';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import ProfileDisplay from './ProfileDisplay';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { useCallback, useEffect, useState } from 'react';
+import {  useEffect, useState } from 'react';
 import axios from 'axios';
 import { useToken } from '../hooks/useToken';
 import { Profile } from '../types';
-import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 
@@ -19,15 +19,14 @@ type ProfileScreenProps = NativeStackScreenProps<BottomTabsParamList, 'Profile'>
 
 const ProfileScreen = ({route,navigation}:ProfileScreenProps) => {
 
-    const [matches , setMatches] = useState<Profile[]>([]);
     const [loading , setLoading] = useState(false);
-    const {token} = useToken();
-    const [tried, setTried] = useState(false);
+    const {token,setToken} = useToken();
+    const [profile , setProfile] = useState<Profile|null>(null);
     
-    const getMatch = async()=>{
+    const getProfile = async()=>{
         setLoading(true);
         try{
-            const response = await axios.get('http://10.81.4.206:3000/users/matches',{
+            const response = await axios.get('http://10.81.4.206:3000/users/me',{
                 headers:{
                     authorization: token
                 }
@@ -35,8 +34,7 @@ const ProfileScreen = ({route,navigation}:ProfileScreenProps) => {
             console.log(JSON.stringify(response.data));
             if(response.data){
             
-                setMatches((prev)=>[...prev,...response.data]);
-                setTried(true);
+                setProfile(response.data);
             }
             
         }
@@ -47,102 +45,18 @@ const ProfileScreen = ({route,navigation}:ProfileScreenProps) => {
     }
 
 
-    useFocusEffect(
-        useCallback(()=>{
-            if(matches.length === 0 && !tried){
-                getMatch();
-            }
-        },[matches , tried])
-    );
-    
-    
+    useEffect(()=>{
+        getProfile();
+    },[]);
 
-    const onLike = async(userId:number, likedType:'photo'|'answer', id:number , comment:string)=>{
-        console.log('liked' , userId , likedType , id , comment);
-        
-        // like api call
-        if(likedType === 'photo'){
-            try{
-                await axios.post('http://10.81.4.206:3000/users/imageLiked',{
-                    likedUserId:userId,
-                    imageId:id,
-                    comment:comment
-                },{
-                    headers:{
-                        authorization:token,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                // shift to next
-                setMatches((prev)=>prev.slice(1));
-                setTried(false);
-            }
-            catch(err){
-                //@ts-ignore
-                console.error(err.message);
-            }
-        }
-        else{
-            try{
-                await axios.post('http://10.81.4.206:3000/users/behaviourLiked',{
-                    likedUserId:userId,
-                    behaviourId:id,
-                    comment:comment
-                },{
-                    headers:{
-                        authorization:token
-                    }
-                });
-
-                // shift to next
-                setMatches((prev)=>prev.slice(1));
-                setTried(false);
-            }
-            catch(err){
-                console.error(err);
-            }
-        }
+    const onLogOut = async()=>{
+        await AsyncStorage.removeItem('token');
+        setToken('');
     }
-
-    const onReject = async(userId:number)=>{
-        console.log('rejected');
-        
-        // reject api call 
-        try{
-            await axios.post('http://10.81.4.206:3000/users/reject',{
-                rejectedUserId:userId
-            },{
-                headers:{
-                    authorization:token
-                }
-            })
-            // shift to next
-            setMatches((prev)=>prev.slice(1));
-            setTried(false);
-        }
-        catch(err){
-            console.error(err);
-        }
-    }
-    
     
     return (
         <>
         <ScrollView style={styles.container}>
-                <View style={styles.heroContainer}>
-                    <View style={styles.logoBorder}>
-                        <AntDesign name="hearto" size={23} color="#66295B" />
-                    </View>
-                    <View>
-                        <Text style={{fontFamily:'ModernEra-Bold'}}>Learning your type.</Text>
-                        <Text style={{fontFamily:'ModernEra-Medium'}}>One like goes a long way.</Text>
-                    </View>
-                </View>
-                { !loading && matches.length === 0 &&
-                    <View style={{marginTop:'70%'}}>
-                        <Text style={{fontFamily:'ModernEra-Bold' , fontSize:30 , textAlign:'center'}}>No Match Found 🥺</Text>
-                    </View>
-                }  
                 {loading && 
                     <View style={{marginTop:'60%'}}>
                         <ActivityIndicator
@@ -151,33 +65,18 @@ const ProfileScreen = ({route,navigation}:ProfileScreenProps) => {
                         />
                     </View>
                 }
-                {!loading && matches.length >0 && 
-                    <ProfileDisplay profile={matches[0]} show={true} onLike={onLike}/>
+                <Pressable style={{marginTop:10, flexDirection:'row', justifyContent:'flex-end' }}>
+                    <Text 
+                    style={{color:'white' , textAlign:'right' , backgroundColor:'#66295B' , paddingHorizontal:20 , paddingVertical:10 , borderRadius:10}}
+                    onPress={onLogOut}
+                    >
+                        LogOut
+                    </Text>
+                </Pressable>
+                {!loading && profile && 
+                    <ProfileDisplay profile={profile} show={false}/>
                 }
-
         </ScrollView>
-        { !loading && matches.length > 0 &&
-            <Pressable
-            onPress={()=>onReject(matches[0].id)}
-                style={{
-                    position: 'absolute',
-                    bottom: 15,
-                    left: 30,
-                    backgroundColor: 'white',
-                    width: 60,
-                    height: 60,
-                    borderRadius: 100,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    shadowColor: '#000000',
-                    shadowOffset: {width: 1, height: 2},
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.4,
-                    elevation: 5,
-                }}>
-                <MaterialCommunityIcons name="sword-cross" size={30} color="#000000" />
-            </Pressable>
-        }
         </>
     );
 }

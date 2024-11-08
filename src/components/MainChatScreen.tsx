@@ -93,7 +93,7 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
                     setMessages((prev)=>[...prev,{
                         message:data.payload.message,
                         created_at:new Date(),
-                        receiver_id:34,
+                        receiver_id:route.params.userId,
                         sender_id:route.params?.id
                     }]);
                 }
@@ -111,7 +111,7 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
                 message:message,
                 created_at:new Date(),
                 receiver_id:route.params?.id,
-                sender_id:34
+                sender_id:route.params?.userId
             }]);
             socket.send(JSON.stringify({
                 type:'chat',

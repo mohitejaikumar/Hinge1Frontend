@@ -5,6 +5,7 @@ import { useRegistration } from '../hooks/useRegistration';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import axios from 'axios';
 import { useToken } from '../hooks/useToken';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface RegistrationDetails{
     firstName:string,
@@ -91,6 +92,7 @@ const FinalScreen = () => {
             cofiRef.current?.start();
             await new Promise((resolve)=> setTimeout(resolve, 3000));
             setToken(response.data.token);
+            await AsyncStorage.setItem('token',response.data.token);
             // success
         }
         catch(err){

@@ -9,6 +9,7 @@ import { Profile } from '../types';
 import Modal from "react-native-modal";
 import { AnswerLiked, ImageLiked } from './CustomizedLikedComponent';
 import LikedComponent from './LikedComponent';
+import ImageDisplay from './ImageDisplay';
 
 
 const ProfileDisplay = ({
@@ -55,12 +56,7 @@ const ProfileDisplay = ({
         <ScrollView>
                 <Text style={styles.firstName}>{profile.first_name}</Text>
                 <View>
-                    <Image
-                        source={{
-                            uri:profile.images[0].url
-                        }}
-                        style={styles.imageStyle}
-                    />
+                    <ImageDisplay url={profile.images[0].url}/>
                     {show && <Pressable
                         style={styles.heartIcon}
                         onPress={()=>handleImageLike('photo',profile.images[0].url , profile.images[0].id)}
@@ -117,12 +113,7 @@ const ProfileDisplay = ({
                     profile.images.slice(1,3).map((image:{id:number, url:string},index:number)=>{
                         return (
                             <View key={index}>
-                                <Image
-                                    source={{
-                                        uri:image.url
-                                    }}
-                                    style={styles.imageStyle}
-                                />
+                                <ImageDisplay url={image.url}/>
                                 {show &&<Pressable
                                     style={styles.heartIcon}
                                     onPress={()=>handleImageLike('photo',image.url , image.id)}
@@ -144,12 +135,7 @@ const ProfileDisplay = ({
                     </Pressable>}
                 </View>
                 <View>
-                    <Image
-                        source={{
-                            uri:profile.images[3].url
-                        }}
-                        style={styles.imageStyle}
-                    />
+                    <ImageDisplay url={profile.images[3].url}/>
                     {show && <Pressable
                         style={styles.heartIcon}
                         onPress={()=>handleImageLike('photo',profile.images[3].url , profile.images[3].id)}
@@ -171,12 +157,7 @@ const ProfileDisplay = ({
                     profile.images.slice(4,6).map((image:{id:number, url:string},index:number)=>{
                         return (
                             <View key={index}>
-                                <Image
-                                    source={{
-                                        uri:image.url
-                                    }}
-                                    style={styles.imageStyle}
-                                />
+                                <ImageDisplay  url={image.url}/>
                                 {show && <Pressable
                                     style={styles.heartIcon}
                                     onPress={()=>handleImageLike('photo',image.url , image.id)}
@@ -284,15 +265,6 @@ const styles = StyleSheet.create({
         fontSize:30,
         fontFamily:'ModernEra-Bold',
         marginTop:20,
-    },
-    imageStyle:{
-        width:'100%',
-        height:400,
-        marginTop:20,
-        marginBottom:10,
-        borderRadius:10,
-        resizeMode:'cover',
-
     },
     heartIcon:{
         position: 'absolute',

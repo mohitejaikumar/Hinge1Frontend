@@ -28,7 +28,7 @@ const ChatScreen = ({navigation}:ChatScreenProps) => {
     
     const {token} = useToken();
     const [people, setPeople] = useState<People[]>([]);
-
+    const [userId, setUserId] = useState<number>(0);
 
     const getPeople = async ()=>{
         try{
@@ -38,6 +38,7 @@ const ChatScreen = ({navigation}:ChatScreenProps) => {
                 }
             });
             setPeople(response.data.people);
+            setUserId(response.data.id);
         }
         catch(err){
             console.error(err);
@@ -78,7 +79,8 @@ const ChatScreen = ({navigation}:ChatScreenProps) => {
                                         {
                                             id:person.id , 
                                             first_name:person.first_name,
-                                            image:person.images[0].url
+                                            image:person.images[0].url,
+                                            userId:userId,
                                         },
                                     )
                                 }}

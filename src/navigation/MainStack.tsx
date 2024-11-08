@@ -20,7 +20,8 @@ export type MainStackParamList = {
     MainChatScreen:{
         id:number,
         first_name:string,
-        image:string
+        image:string,
+        userId:number
     },
 }
 
