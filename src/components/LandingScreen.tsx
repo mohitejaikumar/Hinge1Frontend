@@ -16,7 +16,7 @@ type LandingScreenProps = NativeStackScreenProps<AuthStackParamList, 'LandingScr
 
 GoogleSignin.configure({
     //@ts-ignore
-	androidClientId: Config.ANDROID_CLIENT_ID,
+	androidClientId: Config.PROD_ANDROID_CLIENT_ID,
 	scopes: ['profile', 'email'],
 });
 
