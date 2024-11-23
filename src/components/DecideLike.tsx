@@ -12,6 +12,7 @@ import { Profile } from '../types';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { useToken } from '../hooks/useToken';
+import Config from 'react-native-config';
 
 type DecideLikeProps = NativeStackScreenProps<LikesStackParamList, 'DecideLike'>;
 
@@ -31,7 +32,7 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
     const handleAccept = async()=>{
         try{
             // add user to match list
-            await axios.post('http://10.81.4.206:3000/users/accept',{
+            await axios.post(`${Config.BACKEND_URL}/users/accept`,{
                 acceptedUserId:route.params?.id,
                 message:message
             },{
@@ -53,7 +54,7 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
     const handleCross = async()=>{
 
         try{
-            await axios.post('http://10.81.0.239:3000/users/reject',{
+            await axios.post(`${Config.BACKEND_URL}/users/reject`,{
                 rejectedUserId:route.params?.id
             },{
                 headers:{
@@ -75,7 +76,7 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
     const getProfile = async()=>{
         setLoading(true);
         try{
-            const response = await axios.get(`http://10.81.0.239:3000/users/profile/${route.params?.id}`,{
+            const response = await axios.get(`${Config.BACKEND_URL}/users/profile/${route.params?.id}`,{
                 headers:{
                     authorization:token
                 }

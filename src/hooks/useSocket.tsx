@@ -6,7 +6,7 @@ export const useSocket = ()=>{
     const {token} = useToken();
     
     useEffect(()=>{
-        const ws = new WebSocket(`ws://10.81.4.206:8080`);
+        const ws = new WebSocket(`wss://hinge1.backend.jaik.co.in/ws`);
         ws.onopen = ()=>{
             setSocket(ws);
             ws.send(JSON.stringify({

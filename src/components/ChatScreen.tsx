@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useToken } from '../hooks/useToken';
 import { BottomTabsParamList } from '../navigation/MainStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import Config from 'react-native-config';
 
 
 interface People{
@@ -32,7 +33,7 @@ const ChatScreen = ({navigation}:ChatScreenProps) => {
 
     const getPeople = async ()=>{
         try{
-            const response = await axios.get('http://10.81.0.239:3000/users/allMatches',{                
+            const response = await axios.get(`${Config.BACKEND_URL}/users/allMatches`,{                
                 headers:{
                     authorization:token
                 }

@@ -8,6 +8,7 @@ import axios from 'axios';
 import { useToken } from '../hooks/useToken';
 import { Profile } from '../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Config from 'react-native-config';
 
 
 
@@ -26,7 +27,7 @@ const ProfileScreen = ({route,navigation}:ProfileScreenProps) => {
     const getProfile = async()=>{
         setLoading(true);
         try{
-            const response = await axios.get('http://10.81.0.239:3000/users/me',{
+            const response = await axios.get(`${Config.BACKEND_URL}/users/me`,{
                 headers:{
                     authorization: token
                 }

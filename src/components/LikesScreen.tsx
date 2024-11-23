@@ -7,6 +7,7 @@ import { LikesStackParamList } from '../navigation/MainStack';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { useToken } from '../hooks/useToken';
+import Config from 'react-native-config';
 
 
 interface LikedBy{
@@ -39,7 +40,7 @@ const LikesScreen = ({navigation}:LikesScreenProps) => {
     const getAllLikes = async ()=>{
         setLoading(true);
         try{
-            const response = await axios.get('http://10.81.0.239:3000/users/allLikes',{
+            const response = await axios.get(`${Config.BACKEND_URL}/users/allLikes`,{
                 headers:{
                     authorization:token
                 }

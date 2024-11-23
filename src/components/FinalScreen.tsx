@@ -6,6 +6,7 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import axios from 'axios';
 import { useToken } from '../hooks/useToken';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Config from 'react-native-config';
 
 interface RegistrationDetails{
     firstName:string,
@@ -83,21 +84,23 @@ const FinalScreen = () => {
                 });
             });
             formData.append('userData',JSON.stringify(userData));
-            const response = await axios.post('http://10.81.0.239:3000/users/register',formData,{
+            const response = await axios.post(`${Config.BACKEND_URL}/users/register`,formData,{
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             })
-            setisLoading(false);
+            setisLoading(false)
+            setError(false);
             cofiRef.current?.start();
             await new Promise((resolve)=> setTimeout(resolve, 3000));
             setToken(response.data.token);
             await AsyncStorage.setItem('token',response.data.token);
+            console.log(Config.BACKEND_URL);
             // success
         }
         catch(err){
             //@ts-ignore
-            // console.log(JSON.stringify(err.message));
+            console.log(JSON.stringify(err.message))
             setError(true);
             setisLoading(false);
         }

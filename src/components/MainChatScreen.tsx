@@ -7,6 +7,7 @@ import { useSocket } from '../hooks/useSocket';
 import { useToken } from '../hooks/useToken';
 import axios from 'axios';
 import { ChatBubble } from './ChatBubble';
+import Config from 'react-native-config';
 
 type MainChatScreenProps = NativeStackScreenProps<MainStackParamList, 'MainChatScreen'>;
 interface Message{
@@ -28,7 +29,7 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
     
     const getAllChats = async()=>{
         try{
-            const response = await axios.get(`http://10.81.0.239:3000/users/chats/${route.params.id}`,{                
+            const response = await axios.get(`${Config.BACKEND_URL}/users/chats/${route.params.id}`,{                
                 headers:{
                     authorization:token
                 }
