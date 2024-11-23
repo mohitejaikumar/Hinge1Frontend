@@ -49,7 +49,7 @@ const LandingScreen = ({navigation}:LandingScreenProps) => {
             const email = userInfo.data.user.email;
             // send this email to backend to login 
             try{
-                const response = await axios.post('http://10.81.4.206:3000/users/googleLogin',{
+                const response = await axios.post('http://10.81.0.239:3000/users/googleLogin',{
                     email:email
                 });
                 if(response.data.token){
@@ -74,7 +74,7 @@ const LandingScreen = ({navigation}:LandingScreenProps) => {
     const handleSignInWithPassword = async()=>{
         setLoading(true);
         try{
-            const response = await axios.post('http://10.81.4.206:3000/users/login',{
+            const response = await axios.post('http://10.81.0.239:3000/users/login',{
                 email:userEmail,
                 password:password
             });

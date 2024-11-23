@@ -39,7 +39,7 @@ const LikesScreen = ({navigation}:LikesScreenProps) => {
     const getAllLikes = async ()=>{
         setLoading(true);
         try{
-            const response = await axios.get('http://10.81.4.206:3000/users/allLikes',{
+            const response = await axios.get('http://10.81.0.239:3000/users/allLikes',{
                 headers:{
                     authorization:token
                 }

@@ -26,7 +26,7 @@ const ProfileScreen = ({route,navigation}:ProfileScreenProps) => {
     const getProfile = async()=>{
         setLoading(true);
         try{
-            const response = await axios.get('http://10.81.4.206:3000/users/me',{
+            const response = await axios.get('http://10.81.0.239:3000/users/me',{
                 headers:{
                     authorization: token
                 }
@@ -65,17 +65,18 @@ const ProfileScreen = ({route,navigation}:ProfileScreenProps) => {
                         />
                     </View>
                 }
-                <Pressable style={{marginTop:10, flexDirection:'row', justifyContent:'flex-end' }}>
+                
+                {!loading && profile && 
+                    <ProfileDisplay profile={profile} show={false}/>
+                }
+                <Pressable style={{flexDirection:'row', justifyContent:'center', marginVertical:10 }}>
                     <Text 
-                    style={{color:'white' , textAlign:'right' , backgroundColor:'#66295B' , paddingHorizontal:20 , paddingVertical:10 , borderRadius:10}}
+                    style={{width:'100%',color:'white' , textAlign:'center' , backgroundColor:'#66295B' , paddingHorizontal:20 , paddingVertical:15 , borderRadius:10 , fontFamily:'ModernEra-Bold' , fontSize:20}}
                     onPress={onLogOut}
                     >
                         LogOut
                     </Text>
                 </Pressable>
-                {!loading && profile && 
-                    <ProfileDisplay profile={profile} show={false}/>
-                }
         </ScrollView>
         </>
     );

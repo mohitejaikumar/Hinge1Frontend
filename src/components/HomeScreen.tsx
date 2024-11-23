@@ -26,7 +26,7 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
     const getMatch = async()=>{
         setLoading(true);
         try{
-            const response = await axios.get('http://10.81.4.206:3000/users/matches',{
+            const response = await axios.get('http://10.81.0.239:3000/users/matches',{
                 headers:{
                     authorization: token
                 }
@@ -62,7 +62,7 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
         // like api call
         if(likedType === 'photo'){
             try{
-                await axios.post('http://10.81.4.206:3000/users/imageLiked',{
+                await axios.post('http://10.81.0.239:3000/users/imageLiked',{
                     likedUserId:userId,
                     imageId:id,
                     comment:comment
@@ -83,7 +83,7 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
         }
         else{
             try{
-                await axios.post('http://10.81.4.206:3000/users/behaviourLiked',{
+                await axios.post('http://10.81.0.239:3000/users/behaviourLiked',{
                     likedUserId:userId,
                     behaviourId:id,
                     comment:comment
@@ -108,7 +108,7 @@ const HomeScreen = ({route,navigation}:HomeScreenProps) => {
         
         // reject api call 
         try{
-            await axios.post('http://10.81.4.206:3000/users/reject',{
+            await axios.post('http://10.81.0.239:3000/users/reject',{
                 rejectedUserId:userId
             },{
                 headers:{

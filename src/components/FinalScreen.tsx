@@ -83,7 +83,7 @@ const FinalScreen = () => {
                 });
             });
             formData.append('userData',JSON.stringify(userData));
-            const response = await axios.post('http://10.81.4.206:3000/users/register',formData,{
+            const response = await axios.post('http://10.81.0.239:3000/users/register',formData,{
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

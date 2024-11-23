@@ -32,7 +32,7 @@ const ChatScreen = ({navigation}:ChatScreenProps) => {
 
     const getPeople = async ()=>{
         try{
-            const response = await axios.get('http://10.81.4.206:3000/users/allMatches',{                
+            const response = await axios.get('http://10.81.0.239:3000/users/allMatches',{                
                 headers:{
                     authorization:token
                 }

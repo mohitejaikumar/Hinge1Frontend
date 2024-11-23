@@ -53,7 +53,7 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
     const handleCross = async()=>{
 
         try{
-            await axios.post('http://10.81.4.206:3000/users/reject',{
+            await axios.post('http://10.81.0.239:3000/users/reject',{
                 rejectedUserId:route.params?.id
             },{
                 headers:{
@@ -75,7 +75,7 @@ const DecideLike = ({navigation, route}:DecideLikeProps) => {
     const getProfile = async()=>{
         setLoading(true);
         try{
-            const response = await axios.get(`http://10.81.4.206:3000/users/profile/${route.params?.id}`,{
+            const response = await axios.get(`http://10.81.0.239:3000/users/profile/${route.params?.id}`,{
                 headers:{
                     authorization:token
                 }

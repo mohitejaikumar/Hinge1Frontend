@@ -28,7 +28,7 @@ const MainChatScreen = ({navigation,route}:MainChatScreenProps) => {
     
     const getAllChats = async()=>{
         try{
-            const response = await axios.get(`http://10.81.4.206:3000/users/chats/${route.params.id}`,{                
+            const response = await axios.get(`http://10.81.0.239:3000/users/chats/${route.params.id}`,{                
                 headers:{
                     authorization:token
                 }
